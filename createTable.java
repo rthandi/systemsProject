@@ -7,6 +7,8 @@ public class createTable {
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");) {
 			Statement stmt = null; // a SQL statement object
 			try {
+				// Creating all Tables...
+				System.out.println("Creating all Tables...");
 				stmt = con.createStatement();
 				String sql = "CREATE TABLE Department " +
 							 "(Department_Code VARCHAR(3) not NULL, " +
@@ -14,13 +16,17 @@ public class createTable {
 							 " PRIMARY KEY (Department_Code))";
 				stmt.executeUpdate(sql);
 				
+				// Creating Modules
+				System.out.println("--- Creating Modules");
 				sql = "CREATE TABLE Modules " +
 					 "(Module_id VARCHAR(7) not NULL, " +
 					 " Module_Name VARCHAR(50) not NULL, " +
 					 " Credits SMALLINT not NULL, " +
 					 " PRIMARY KEY (Module_id))";
 					stmt.executeUpdate(sql);
-				
+			
+				// Creating Degree
+				System.out.println("--- Creating Degree");
 				sql = "CREATE TABLE Degree " +
 					 "(Degree_id VARCHAR(8) not NULL, " +
 					 " Degree_Name VARCHAR(50) not NULL, " +
@@ -29,6 +35,8 @@ public class createTable {
 					 " FOREIGN KEY (Department_Code) REFERENCES Department(Department_Code))";
 				stmt.executeUpdate(sql);
 				
+				// Creating User
+				System.out.println("--- Creating User");
 				sql = "CREATE TABLE User " +
 					 "(Username VARCHAR(7) not NULL, " +
 					 " Title VARCHAR(5) not NULL, " +
@@ -41,6 +49,8 @@ public class createTable {
 					 " FOREIGN KEY (Degree_id) REFERENCES Degree (Degree_id))";
 				stmt.executeUpdate(sql);
 				
+				// Creating Student_Module
+				System.out.println("--- Creating Student_Module");
 				sql = "CREATE TABLE Student_Module" +
 					 "(Username VARCHAR(7) not NULL, " +
 					 " Module_id VARCHAR(7) not NULL, " +
@@ -48,6 +58,8 @@ public class createTable {
 					 " FOREIGN KEY (Username) REFERENCES User (Username))";
 				stmt.executeUpdate(sql);
 				
+				// Creating Degree_Module_Approved
+				System.out.println("--- Creating Degree_Module_Approved");
 				sql = "CREATE TABLE Degree_Module_Approved " +
 					 "(Degree_id VARCHAR(8) not NULL, " +
 					 " Level VARCHAR(1) not NULL, " +
@@ -56,6 +68,9 @@ public class createTable {
 					 " FOREIGN KEY (Degree_id) REFERENCES Degree (Degree_id), " +
 					 " FOREIGN KEY (Module_id) REFERENCES Modules (Module_id))";
 				stmt.executeUpdate(sql);
+				
+				// Done
+				System.out.println("Completed table creation");
 			}
 			catch (SQLException ex) {
 			 ex.printStackTrace();
