@@ -1,0 +1,31 @@
+Set up VPN
+https://www.sheffield.ac.uk/cics/vpn/windows#tab02
+
+Get remote access password
+https://www.sheffield.ac.uk/cics/password
+Start connection, connect to VPN, Login
+
+MySQL installer - scroll down a bit for windows
+https://dev.mysql.com/downloads/windows/installer/8.0.html
+
+connect java driver to project. slide 12/13
+https://staffwww.dcs.shef.ac.uk/people/A.Simons/campus_only/design/09%20Java%20and%20MySQL.pdf
+
+-- Code to connect to database
+import java.sql.*;
+
+public class dropTable {
+	public static void main(String[] args) {
+		
+		try (Connection con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");) {
+
+
+		}
+		catch (SQLException ex) {
+		 ex.printStackTrace();
+		}
+
+	}
+
+}
+
