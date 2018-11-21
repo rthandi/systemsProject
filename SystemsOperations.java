@@ -1,7 +1,8 @@
+import java.sql.Connection;
 import java.util.Objects;
 
 public class SystemsOperations {
-    public boolean checkTotalCredits(User user, Connection con){
+    public static boolean checkTotalCredits(User user, Connection con){
         stmt = con.createStatement();
         String query = "SELECT Credits " +
                 "FROM modules m " +
@@ -22,5 +23,24 @@ public class SystemsOperations {
         } else {
             return counter == 180;
         }
+    }
+
+    //DELETION OPERATIONS
+    public static void deleteDepartment (User currentUser, String departmentToDelete, Connection con){
+        //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
+        stmt = con.createStatement();
+        //If database is setup correctly this should cascade and delete any mentions of this department
+        String query = "DELETE FROM Department" +
+                "WHERE DepartmentCode = " + departmentToDelete;
+        stmt.executeQuery(query);
+    }
+
+    //ADDING OPERATIONS
+    public static void addDepartment (User currentUser, String departmentCode, String departmentName, Connection con){
+        //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
+        stmt = con.createStatement();
+        String query = "INSERT INTO Department" +
+                "VALUES (" + departmentCode + ", " + departmentName + ")";
+        stmt.executeQuery(query);
     }
 }
