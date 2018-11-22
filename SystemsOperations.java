@@ -95,6 +95,7 @@ public class SystemsOperations {
 
     public static boolean addDegree (User currentUser, String degreeId, String degreeName, String departmentCode, Connection con) throws SQLException {
         try {
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
             Statement stmt = con.createStatement();
             String query = "SELECT Department_Code " +
                     "FROM Department " +
