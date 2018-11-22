@@ -60,6 +60,12 @@ public class SystemsOperations {
         }
     }
 
+    /**
+     * @param currentUser The currently logged in user
+     * @param degreeIdToDelete the ID of the degree that is to be deleted
+     * @param con The open connection to the database
+     * @throws SQLException Will print out the error with the database if one is encountered
+     */
     public static void deleteDegree (User currentUser, String degreeIdToDelete, Connection con) throws SQLException{
         try {
             //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
@@ -93,6 +99,15 @@ public class SystemsOperations {
         }
     }
 
+    /**
+     * @param currentUser The currently logged in user
+     * @param degreeId The ID of the degree to add
+     * @param degreeName The name of the degree to add
+     * @param departmentCode The department code that the degree belongs too
+     * @param con The current connection to the database
+     * @return True if successful and false if not successful
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
     public static boolean addDegree (User currentUser, String degreeId, String degreeName, String departmentCode, Connection con) throws SQLException {
         try {
             //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
