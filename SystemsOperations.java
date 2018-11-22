@@ -60,6 +60,19 @@ public class SystemsOperations {
         }
     }
 
+    public static void deleteDegree (User currentUser, String degreeIdToDelete, Connection con) throws SQLException{
+        try {
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
+            Statement stmt = con.createStatement();
+            //If database is setup correctly this should cascade and delete any mentions of this department
+            String query = "DELETE FROM Degree " +
+                    "WHERE Degree_id = " + degreeIdToDelete;
+            stmt.executeQuery(query);
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+        }
+    }
+
     /**
      * @param currentUser The user that is currently logged in
      * @param departmentCode The code of the department that is being added
@@ -76,6 +89,27 @@ public class SystemsOperations {
                     "VALUES (" + departmentCode + ", " + departmentName + ")";
             stmt.executeQuery(query);
         } catch (SQLException e ) {
+            e.printStackTrace(System.err);
+        }
+    }
+
+    public static boolean addDegree (User currentUser, String degreeId, String degreeName, String departmentCode, Connection con) throws SQLException {
+        try {
+            Statement stmt = con.createStatement();
+            String query = "SELECT Department_Code " +
+                    "FROM Department " +
+                    "WHERE Department_Code = " + departmentCode;
+            ResultSet rs = stmt.executeQuery(query);
+            //Check if the department that was inputted exists
+            if (rs.next()) {
+                query = "INSERT INTO Degree " +
+                        "VALUES (" + degreeId + ", " + degreeName + ", " + departmentCode + ")";
+                stmt.executeQuery(query);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
             e.printStackTrace(System.err);
         }
     }
