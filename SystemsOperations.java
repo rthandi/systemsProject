@@ -81,29 +81,29 @@ public class SystemsOperations {
     }
 
 // Not currently using but leaving it in if we find it useful later for debugging purposes. Following is taken from oracle docs (I think it should be built into jdbc under JDBCTutorialUtilities however this is not working correctly on mine so someone else should check) - Robbie
-    public static void printSQLException(SQLException ex) {
-        for (Throwable e : ex) {
-            if (e instanceof SQLException) {
-                if (ignoreSQLException(
-                        ((SQLException)e).
-                                getSQLState()) == false) {
-
-                    e.printStackTrace(System.err);
-                    System.err.println("SQLState: " +
-                            ((SQLException)e).getSQLState());
-
-                    System.err.println("Error Code: " +
-                            ((SQLException)e).getErrorCode());
-
-                    System.err.println("Message: " + e.getMessage());
-
-                    Throwable t = ex.getCause();
-                    while(t != null) {
-                        System.out.println("Cause: " + t);
-                        t = t.getCause();
-                    }
-                }
-            }
-        }
-    }
+//    public static void printSQLException(SQLException ex) {
+//        for (Throwable e : ex) {
+//            if (e instanceof SQLException) {
+//                if (ignoreSQLException(
+//                        ((SQLException)e).
+//                                getSQLState()) == false) {
+//
+//                    e.printStackTrace(System.err);
+//                    System.err.println("SQLState: " +
+//                            ((SQLException)e).getSQLState());
+//
+//                    System.err.println("Error Code: " +
+//                            ((SQLException)e).getErrorCode());
+//
+//                    System.err.println("Message: " + e.getMessage());
+//
+//                    Throwable t = ex.getCause();
+//                    while(t != null) {
+//                        System.out.println("Cause: " + t);
+//                        t = t.getCause();
+//                    }
+//                }
+//            }
+//        }
+//    }
 }
