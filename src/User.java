@@ -51,6 +51,11 @@ public class User {
         return tutorName;
     }
 
+    public String getFullName(){
+        return (title + otherNames + surname);
+
+    }
+
     //TODO: delete this at the end if not needed
     //SETTER METHODS (MAY NOT NEED SO NOT ADDING YET)
 }

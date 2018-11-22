@@ -23,7 +23,7 @@ public class AppFrame extends JFrame {
 
     }
 
-    public void toStudentPanel(String student){
+    public void toStudentPanel(User student){
         Container contentPane = getContentPane();
         contentPane.removeAll();
 

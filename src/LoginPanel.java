@@ -27,8 +27,10 @@ public class LoginPanel extends JPanel{
                     String password = passwordField.getText();
                     ////////////////////password needs to be hashed etc
                     System.out.println(username);
+                    //TODO check if the give username is in the database and if so the User is returned
                     if(username.equals("student")){
-                        appFrame.toStudentPanel(username);
+                        User user = new User();
+                        appFrame.toStudentPanel(user);
                     }
                 }
             }
@@ -40,4 +42,5 @@ public class LoginPanel extends JPanel{
         add(passwordField);
         add(submitButton);
     }
+
 }
