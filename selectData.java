@@ -105,7 +105,7 @@ public class selectData {
 	 		        String comp = res.getString("Compulsory");
   		            //Display values
 	 		        System.out.print("Degree Id: " + id);
-	 		        System.out.print(", Leve: " + level);
+	 		        System.out.print(", Level: " + level);
 	 		        System.out.print(", Module Id: " + modId);
 	 		        System.out.println(", Compulosry: " + comp);
 	 		    }
