@@ -111,6 +111,7 @@ public class SystemsOperations {
             }
         } catch (SQLException e) {
             e.printStackTrace(System.err);
+            return false;
         }
     }
 
