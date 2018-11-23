@@ -1,3 +1,5 @@
+package classes;
+
 public class User {
     // This is a class that will be used to represent the data of a user as an object once it has been fetched from the database
 
