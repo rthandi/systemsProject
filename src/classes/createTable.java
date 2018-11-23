@@ -1,3 +1,5 @@
+package classes;
+
 import java.sql.*; // adequate for most purposes
 import javax.sql.*; // only for advanced features
 
