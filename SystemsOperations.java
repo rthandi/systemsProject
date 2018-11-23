@@ -80,6 +80,25 @@ public class SystemsOperations {
     }
 
     /**
+     * @param currentUser The currently logged in user
+     * @param moduleId the ID of the module that is to be deleted
+     * @param con The open connection to the database
+     * @throws SQLException Will print out the error with the database if one is encountered
+     */
+    public static void deleteModule (User currentUser, String moduleId, Connection con) throws SQLException {
+        try {
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
+            Statement stmt = con.createStatement();
+            //If database is setup correctly this should cascade and delete any mentions of this department
+            String query = "DELETE FROM Modules " +
+                    "WHERE Module_id = " + moduleId;
+            stmt.executeQuery(query);
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+        }
+    }
+
+    /**
      * @param currentUser The user that is currently logged in
      * @param departmentCode The code of the department that is being added
      * @param departmentName The name of the department that is being added
@@ -112,7 +131,7 @@ public class SystemsOperations {
         try {
             //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
             Statement stmt = con.createStatement();
-            String query = "SELECT Department_Code " +
+            String query = "SELECT  Department_Name " +
                     "FROM Department " +
                     "WHERE Department_Code = " + departmentCode;
             ResultSet rs = stmt.executeQuery(query);
@@ -128,6 +147,41 @@ public class SystemsOperations {
         } catch (SQLException e) {
             e.printStackTrace(System.err);
             return false;
+        }
+    }
+
+    public static boolean addModule  (User currentUser, String moduleId, String moduleName, int credits, char level, boolean compulsory, String degreeId, Connection con) throws SQLException {
+        try {
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
+            Statement stmt = con.createStatement();
+            String query = "SELECT Degree_Name " +
+                    "FROM Degree " +
+                    "WHERE Degree_id = " + degreeId;
+            ResultSet rs = stmt.executeQuery(query);
+            //Check to see if the inputted department exists
+            if (rs.next()) {
+                //First insert into Modules
+                query = "INSERT INTO Modules " +
+                        "VALUES ( " + moduleId + ", " + moduleName + ", " + credits + ")";
+                stmt.executeQuery(query);
+                query = "INSERT INTO Degree_Module_Approved " +
+                        "VALUES ( " + degreeId + ", " + level + ", " + moduleId + ", " + boolToInt(compulsory) + ")";
+                stmt.executeQuery(query);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return false;
+        }
+    }
+
+    private static int boolToInt(Boolean bool){
+        if (bool){
+            return 1;
+        } else {
+            return 0;
         }
     }
 
