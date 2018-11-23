@@ -64,17 +64,21 @@ public class selectData {
 	 			while(res.next()){
 	 				//Retrieve by column name
 	 		        String user = res.getString("Username");
+	 		        String hash = res.getString("Hash");
 	 		        String title = res.getString("Title");
 	 		        String surname = res.getString("Surname");
 	 		        String other = res.getString("Other_names");
+	 		        String role = res.getString("Role");
 	 		        String degreeId = res.getString("Degree_id");
 	 		        String email = res.getString("Email");
 	 		        String tutor = res.getString("Tutor");
  		            //Display values
 	 		        System.out.print("Username: " + user);
+	 		        System.out.print(" Hash: " + hash);
 	 		        System.out.print(", Title: " + title);
 	 		        System.out.print(", Surname: " + surname);
 	 		        System.out.print(", Other: " + other);
+	 		        System.out.print(" Role: " + role);
 	 		        System.out.print(", Degree Id: " + degreeId);
 	 		        System.out.print(", Email: " + email);
 	 		        System.out.println(", Tutor: " + tutor);
