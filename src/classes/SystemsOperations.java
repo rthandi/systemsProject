@@ -50,12 +50,16 @@ public class SystemsOperations {
     //DELETION OPERATIONS
     public static void deleteDepartment (User currentUser, String departmentToDelete, Connection con) throws SQLException {
         try {
-            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
-            Statement stmt = con.createStatement();
-            //If database is setup correctly this should cascade and delete any mentions of this department
-            String query = "DELETE FROM Department " +
-                    "WHERE Department_Code = " + departmentToDelete;
-            stmt.executeUpdate(query);
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
+        	if (permissionCheck(currentUser) >= 4) { 
+	            Statement stmt = con.createStatement();
+	            //If database is setup correctly this should cascade and delete any mentions of this department
+	            String query = "DELETE FROM Department " +
+	                    "WHERE Department_Code = " + departmentToDelete;
+	            stmt.executeUpdate(query);
+        	} else {
+        		System.out.println("Permission level not high enough to perform this operation");
+        	}
         } catch (SQLException e ) {
             e.printStackTrace(System.err);
         }
@@ -69,12 +73,16 @@ public class SystemsOperations {
      */
     public static void deleteDegree (User currentUser, String degreeIdToDelete, Connection con) throws SQLException{
         try {
-            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
-            Statement stmt = con.createStatement();
-            //If database is setup correctly this should cascade and delete any mentions of this department
-            String query = "DELETE FROM Degree " +
-                    "WHERE Degree_id = " + degreeIdToDelete;
-            stmt.executeUpdate(query);
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
+        	if (permissionCheck(currentUser) >= 4) {
+	            Statement stmt = con.createStatement();
+	            //If database is setup correctly this should cascade and delete any mentions of this department
+	            String query = "DELETE FROM Degree " +
+	                    "WHERE Degree_id = " + degreeIdToDelete;
+	            stmt.executeUpdate(query);
+    		} else {
+        		System.out.println("Permission level not high enough to perform this operation");
+        	}
         } catch (SQLException e) {
             e.printStackTrace(System.err);
         }
@@ -88,12 +96,16 @@ public class SystemsOperations {
      */
     public static void deleteModule (User currentUser, String moduleId, Connection con) throws SQLException {
         try {
-            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
-            Statement stmt = con.createStatement();
-            //If database is setup correctly this should cascade and delete any mentions of this department
-            String query = "DELETE FROM Modules " +
-                    "WHERE Module_id = " + moduleId;
-            stmt.executeUpdate(query);
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
+        	if (permissionCheck(currentUser) >= 4) {
+	            Statement stmt = con.createStatement();
+	            //If database is setup correctly this should cascade and delete any mentions of this department
+	            String query = "DELETE FROM Modules " +
+	                    "WHERE Module_id = " + moduleId;
+	            stmt.executeUpdate(query);
+    		} else {
+        		System.out.println("Permission level not high enough to perform this operation");
+        	}
         } catch (SQLException e) {
             e.printStackTrace(System.err);
         }
@@ -109,11 +121,15 @@ public class SystemsOperations {
     //ADDING OPERATIONS
     public static void addDepartment (User currentUser, String departmentCode, String departmentName, Connection con) throws SQLException {
         try {
-            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
-            Statement stmt = con.createStatement();
-            String query = "INSERT INTO Department " +
-                    "VALUES (" + departmentCode + ", " + departmentName + ")";
-            stmt.executeUpdate(query);
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
+        	if (permissionCheck(currentUser) >= 4) {
+	            Statement stmt = con.createStatement();
+	            String query = "INSERT INTO Department " +
+	                    "VALUES (" + departmentCode + ", " + departmentName + ")";
+	            stmt.executeUpdate(query);
+        	} else {
+        		System.out.println("Permission level not high enough to perform this operation");
+        	}
         } catch (SQLException e ) {
             e.printStackTrace(System.err);
         }
@@ -130,21 +146,26 @@ public class SystemsOperations {
      */
     public static boolean addDegree (User currentUser, String degreeId, String degreeName, String departmentCode, Connection con) throws SQLException {
         try {
-            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
-            Statement stmt = con.createStatement();
-            String query = "SELECT  Department_Name " +
-                    "FROM Department " +
-                    "WHERE Department_Code = " + departmentCode;
-            ResultSet rs = stmt.executeQuery(query);
-            //Check if the department that was inputted exists
-            if (rs.next()) {
-                query = "INSERT INTO Degree " +
-                        "VALUES (" + degreeId + ", " + degreeName + ", " + departmentCode + ")";
-                stmt.executeUpdate(query);
-                return true;
-            } else {
-                return false;
-            }
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4 
+        	if (permissionCheck(currentUser) >= 4) {
+	            Statement stmt = con.createStatement();
+	            String query = "SELECT  Department_Name " +
+	                    "FROM Department " +
+	                    "WHERE Department_Code = " + departmentCode;
+	            ResultSet rs = stmt.executeQuery(query);
+	            //Check if the department that was inputted exists
+	            if (rs.next()) {
+	                query = "INSERT INTO Degree " +
+	                        "VALUES (" + degreeId + ", " + degreeName + ", " + departmentCode + ")";
+	                stmt.executeUpdate(query);
+	                return true;
+	            } else {
+	                return false;
+	            }
+        	} else {
+        		System.out.println("Permission level not high enough to perform this operation");
+        		return false;
+        	}
         } catch (SQLException e) {
             e.printStackTrace(System.err);
             return false;
@@ -153,25 +174,30 @@ public class SystemsOperations {
 
     public static boolean addModule  (User currentUser, String moduleId, String moduleName, int credits, char level, boolean compulsory, String degreeId, Connection con) throws SQLException {
         try {
-            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet
-            Statement stmt = con.createStatement();
-            String query = "SELECT Degree_Name " +
-                    "FROM Degree " +
-                    "WHERE Degree_id = " + degreeId;
-            ResultSet rs = stmt.executeQuery(query);
-            //Check to see if the inputted department exists
-            if (rs.next()) {
-                //First insert into Modules
-                query = "INSERT INTO Modules " +
-                        "VALUES ( " + moduleId + ", " + moduleName + ", " + credits + ")";
-                stmt.executeUpdate(query);
-                query = "INSERT INTO Degree_Module_Approved " +
-                        "VALUES ( " + degreeId + ", " + level + ", " + moduleId + ", " + boolToInt(compulsory) + ")";
-                stmt.executeUpdate(query);
-                return true;
-            } else {
-                return false;
-            }
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
+        	if (permissionCheck(currentUser) >= 4) {
+	            Statement stmt = con.createStatement();
+	            String query = "SELECT Degree_Name " +
+	                    "FROM Degree " +
+	                    "WHERE Degree_id = " + degreeId;
+	            ResultSet rs = stmt.executeQuery(query);
+	            //Check to see if the inputted department exists
+	            if (rs.next()) {
+	                //First insert into Modules
+	                query = "INSERT INTO Modules " +
+	                        "VALUES ( " + moduleId + ", " + moduleName + ", " + credits + ")";
+	                stmt.executeUpdate(query);
+	                query = "INSERT INTO Degree_Module_Approved " +
+	                        "VALUES ( " + degreeId + ", " + level + ", " + moduleId + ", " + boolToInt(compulsory) + ")";
+	                stmt.executeUpdate(query);
+	                return true;
+	            } else {
+	                return false;
+	            }
+        	} else {
+        		System.out.println("Permission level not high enough to perform this operation");
+        		return false;
+        	}
         } catch (SQLException e){
             e.printStackTrace(System.err);
             return false;
@@ -184,6 +210,26 @@ public class SystemsOperations {
         } else {
             return 0;
         }
+    }
+    
+    /**
+     * 
+     * @param user
+     * @return permission level of the user as an int
+     */
+    public static int permissionCheck (User currentUser) {
+    	String permission = currentUser.getRole();
+    	int level = 0;
+    	if (permission == "Student")
+    		level = 1;
+    	else if (permission == "Teacher")
+    		level = 2;
+    	else if (permission == "Registrar")
+    		level = 3;
+    	else if (permission == "Administrator")
+    		level = 4;
+    	return level;
+    	
     }
 
 // Not currently using but leaving it in if we find it useful later for debugging purposes. Following is taken from oracle docs (I think it should be built into jdbc under JDBCTutorialUtilities however this is not working correctly on mine so someone else should check) - Robbie
