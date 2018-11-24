@@ -1,6 +1,8 @@
+package gui;
+import classes.*;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
 
 public class AppFrame extends JFrame {
@@ -31,7 +33,6 @@ public class AppFrame extends JFrame {
 
         contentPane.revalidate();
         contentPane.repaint();
-
     }
 
 
