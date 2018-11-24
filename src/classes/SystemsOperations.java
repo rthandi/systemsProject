@@ -280,7 +280,7 @@ public class SystemsOperations {
         }
     }
     
-    /* Commented out as other things need to be created first
+    /** Commented out as other things need to be created first
      * 
      * @param currentUser The currently logged in user
      * @param username For the new student
@@ -294,6 +294,7 @@ public class SystemsOperations {
      * @param con The current connection to the database
      * @return boolean if user addition was a success or not
      * @throws SQLException
+     */
      
     public static boolean addUser (User currentUser, String username, String hash, String surname, String other, 
     		String role, String degreeId, String email, String tutor, Connection con) throws SQLException {
@@ -313,6 +314,18 @@ public class SystemsOperations {
 	            	query = "INSERT INTO User " +
 	  		              "VALUES ( " + username + ", " + hash + ", " + surname + ", " + other + ", " + role + ", " + degreeId+ ", " + email + ", " + tutor + ")";
 	                stmt.executeUpdate(query);
+	                
+	                query = " SELECT Module_id FROM Degree_Module_Approved " +
+	                		" WHERE Compulsory = 'True' AND Degree_id = " + degreeId;
+	                rs = stmt.executeQuery(query);
+	                ResultSetMetaData rsmd = rs.getMetaData();
+	                int numModules = rsmd.getColumnCount();
+	                
+	                for (int i=0; i<=numModules; i++) {
+	                	query = "INSERT INTO Student_Module " +
+	                			"VALUES ( " + username + ", " + rs.getString(i) + ")";
+	                	stmt.execute(query);
+	                }
 	            	return true;
 	            }
         	} else {
@@ -323,7 +336,7 @@ public class SystemsOperations {
             e.printStackTrace(System.err);
             return false;
         }
-    } */
+    } 
 
     private static int boolToInt(Boolean bool){
         if (bool){
