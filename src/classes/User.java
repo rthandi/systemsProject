@@ -14,9 +14,10 @@ public class User {
     private String degreeId;
     private String email;
     private String tutorName;
+    private char level;
 
     //CONSTRUCTOR
-    public User (String registrationNumberInput, String hashInput, String titleInput, String surnameInput, String otherNamesInput, String roleInput, String degreeIdInput, String emailInput, String tutorNameInput){
+    public User (String registrationNumberInput, String hashInput, String titleInput, String surnameInput, String otherNamesInput, String roleInput, String degreeIdInput, String emailInput, String tutorNameInput, char levelInput){
         registrationNumber = registrationNumberInput;
         hash = hashInput;
         title = titleInput;
@@ -26,6 +27,7 @@ public class User {
         degreeId = degreeIdInput;
         email = emailInput;
         tutorName = tutorNameInput;
+        level = levelInput;
     }
 
     //GETTER METHODS
@@ -64,6 +66,8 @@ public class User {
     public String getTutorName() {
         return tutorName;
     }
+
+    public char getLevel() { return level; }
 
     //TODO: delete this at the end if not needed
     //SETTER METHODS (MAY NOT NEED SO NOT ADDING YET)

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class SystemsOperations {
@@ -14,15 +15,17 @@ public class SystemsOperations {
      * @throws SQLException If error with database then will print the error and return false
      */
     public static boolean checkTotalCredits(User user, Connection con) throws SQLException {
+		Statement stmt = null;
+		ResultSet rs = null;
         try {
-            Statement stmt = con.createStatement();
+            stmt = con.createStatement();
             String query = "SELECT Credits " +
                     "FROM Student_Module " +
                     "WHERE Username = " + user.getRegistrationNumber() +
                     " INNER JOIN Modules " +
                     " ON Student_Module.Module_id = Modules.Module_id";
             //Insert sql query to get the modules that the user is doing
-            ResultSet rs = stmt.executeQuery(query);
+            rs = stmt.executeQuery(query);
             // Iterate over the ResultSet to total up the credits
             int counter = 0;
             while (rs.next()) {
@@ -38,8 +41,12 @@ public class SystemsOperations {
         } catch (SQLException e ) {
             e.printStackTrace(System.err);
             return false;
-        }
+        } finally {
+			try { if (rs != null) rs.close(); } catch (Exception e) {}
+			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+		}
     }
+
 
     /**
      * @param currentUser The user that is currently logged in
@@ -49,10 +56,11 @@ public class SystemsOperations {
      */
     //DELETION OPERATIONS
     public static void deleteDepartment (User currentUser, String departmentToDelete, Connection con) throws SQLException {
+		Statement stmt = null;
         try {
             //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
         	if (permissionCheck(currentUser) >= 4) { 
-	            Statement stmt = con.createStatement();
+	            stmt = con.createStatement();
 	            //If database is setup correctly this should cascade and delete any mentions of this department
 	            String query = "DELETE FROM Department " +
 	                    "WHERE Department_Code = " + departmentToDelete;
@@ -62,7 +70,9 @@ public class SystemsOperations {
         	}
         } catch (SQLException e ) {
             e.printStackTrace(System.err);
-        }
+        } finally {
+			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+		}
     }
 
     /**
@@ -72,10 +82,11 @@ public class SystemsOperations {
      * @throws SQLException Will print out the error with the database if one is encountered
      */
     public static void deleteDegree (User currentUser, String degreeIdToDelete, Connection con) throws SQLException{
+		Statement stmt = null;
         try {
             //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
         	if (permissionCheck(currentUser) >= 4) {
-	            Statement stmt = con.createStatement();
+	            stmt = con.createStatement();
 	            //If database is setup correctly this should cascade and delete any mentions of this department
 	            String query = "DELETE FROM Degree " +
 	                    "WHERE Degree_id = " + degreeIdToDelete;
@@ -85,7 +96,9 @@ public class SystemsOperations {
         	}
         } catch (SQLException e) {
             e.printStackTrace(System.err);
-        }
+        } finally {
+			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+		}
     }
 
     /**
@@ -95,10 +108,12 @@ public class SystemsOperations {
      * @throws SQLException Will print out the error with the database if one is encountered
      */
     public static void deleteModule (User currentUser, String moduleId, Connection con) throws SQLException {
+		Statement stmt = null;
+
         try {
             //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
         	if (permissionCheck(currentUser) >= 4) {
-	            Statement stmt = con.createStatement();
+	            stmt = con.createStatement();
 	            //If database is setup correctly this should cascade and delete any mentions of this department
 	            String query = "DELETE FROM Modules " +
 	                    "WHERE Module_id = " + moduleId;
@@ -108,7 +123,9 @@ public class SystemsOperations {
         	}
         } catch (SQLException e) {
             e.printStackTrace(System.err);
-        }
+        } finally {
+			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+		}
     }
 
     /**
@@ -120,10 +137,12 @@ public class SystemsOperations {
      */
     //ADDING OPERATIONS
     public static void addDepartment (User currentUser, String departmentCode, String departmentName, Connection con) throws SQLException {
+		Statement stmt = null;
+		ResultSet rs = null;
         try {
             //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
         	if (permissionCheck(currentUser) >= 4) {
-	            Statement stmt = con.createStatement();
+	            stmt = con.createStatement();
 	            String query = "INSERT INTO Department " +
 	                    "VALUES (" + departmentCode + ", " + departmentName + ")";
 	            stmt.executeUpdate(query);
@@ -145,14 +164,16 @@ public class SystemsOperations {
      * @throws SQLException Throws and prints the error if there is an issue with the database
      */
     public static boolean addDegree (User currentUser, String degreeId, String degreeName, String departmentCode, Connection con) throws SQLException {
+		Statement stmt = null;
+		ResultSet rs = null;
         try {
             //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4 
         	if (permissionCheck(currentUser) >= 4) {
-	            Statement stmt = con.createStatement();
+	            stmt = con.createStatement();
 	            String query = "SELECT  Department_Name " +
 	                    "FROM Department " +
 	                    "WHERE Department_Code = " + departmentCode;
-	            ResultSet rs = stmt.executeQuery(query);
+	            rs = stmt.executeQuery(query);
 	            //Check if the department that was inputted exists
 	            if (rs.next()) {
 	                query = "INSERT INTO Degree " +
@@ -169,18 +190,23 @@ public class SystemsOperations {
         } catch (SQLException e) {
             e.printStackTrace(System.err);
             return false;
-        }
+        } finally {
+			try { if (rs != null) rs.close(); } catch (Exception e) {}
+			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+		}
     }
 
     public static boolean addModule  (User currentUser, String moduleId, String moduleName, int credits, char level, boolean compulsory, String degreeId, Connection con) throws SQLException {
+		Statement stmt = null;
+		ResultSet rs = null;
         try {
             //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
         	if (permissionCheck(currentUser) >= 4) {
-	            Statement stmt = con.createStatement();
+	            stmt = con.createStatement();
 	            String query = "SELECT Degree_Name " +
 	                    "FROM Degree " +
 	                    "WHERE Degree_id = " + degreeId;
-	            ResultSet rs = stmt.executeQuery(query);
+	            rs = stmt.executeQuery(query);
 	            //Check to see if the inputted department exists
 	            if (rs.next()) {
 	                //First insert into Modules
@@ -201,7 +227,10 @@ public class SystemsOperations {
         } catch (SQLException e){
             e.printStackTrace(System.err);
             return false;
-        }
+        } finally {
+			try { if (rs != null) rs.close(); } catch (Exception e) {}
+			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+		}
     }
 
     private static int boolToInt(Boolean bool){
@@ -230,6 +259,75 @@ public class SystemsOperations {
     		level = 4;
     	return level;
     }
+
+    public static boolean checkRegValid(User currentUser, User userToCheck, Connection con) throws SQLException {
+		Statement stmt = null;
+		ResultSet rsModules = null;
+		ResultSet rsModulesApproved = null;
+		try {
+			//first we validate the user's privileges
+			if (permissionCheck(currentUser) <= 2){
+				System.out.println("Permission level not high enough to perform this operation");
+				return false;
+			}
+			//next we check if the total number of credits is correct
+			if (!checkTotalCredits(userToCheck, con)){
+				return false;
+			}
+			//Now we get the modules and check that they are all approved
+			stmt = con.createStatement();
+			String query = "SELECT Module_id " +
+					"FROM Student_Module " +
+					"WHERE Username = " + userToCheck.getRegistrationNumber();
+			rsModules = stmt.executeQuery(query);
+			query = "SELECT Module_id, compulsory " +
+					"FROM Degree_Module_Approved " +
+					"WHERE Degree_id = " + userToCheck.getDegreeId() + " AND Level = " + currentUser.getLevel();
+			rsModulesApproved = stmt.executeQuery(query);
+			//Now we have the data we need to put it into a data structure that is easier to use
+			ArrayList<String> moduleArray = new ArrayList<>();
+			ArrayList<String> moduleArrayCompulsory = new ArrayList<>();
+			ArrayList<String> moduleArrayOptional = new ArrayList<>();
+			while(rsModules.next()){
+				moduleArray.add(rsModules.getString("Module_id"));
+			}
+			while(rsModulesApproved.next()){
+				//may need to change this too boolean but pretty sure it will work like this
+				if (rsModulesApproved.getInt("Compulsory") == 1){
+					moduleArrayCompulsory.add(rsModulesApproved.getString("Module_id"));
+				} else {
+					moduleArrayOptional.add(rsModulesApproved.getString("Module_id"));
+				}
+			}
+			//Now we need to check that the student has all of the compulsory modules
+			for (String currentModule :
+					moduleArrayCompulsory) {
+					if (!moduleArray.contains(currentModule)) {
+							return false;
+						}
+					else {
+						moduleArray.remove(currentModule);
+					}
+				}
+			//Now we need to check that the remaining modules are possible compulsory modules
+			while (!moduleArray.isEmpty()){
+				if (!moduleArrayOptional.contains(moduleArray.get(0))){
+					return false;
+				}
+				else {
+					moduleArray.remove(0);
+				}
+			}
+			return true;
+		} catch (SQLException e){
+			e.printStackTrace(System.err);
+			return false;
+		} finally {
+			try { if (rsModules != null) rsModules.close(); } catch (Exception e) {}
+			try { if (rsModulesApproved != null) rsModulesApproved.close(); } catch (Exception e) {}
+			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+		}
+	}
 
 // Not currently using but leaving it in if we find it useful later for debugging purposes. Following is taken from oracle docs (I think it should be built into jdbc under JDBCTutorialUtilities however this is not working correctly on mine so someone else should check) - Robbie
 //    public static void printSQLException(SQLException ex) {
