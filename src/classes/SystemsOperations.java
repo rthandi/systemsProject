@@ -55,7 +55,7 @@ public class SystemsOperations {
             //If database is setup correctly this should cascade and delete any mentions of this department
             String query = "DELETE FROM Department " +
                     "WHERE Department_Code = " + departmentToDelete;
-            stmt.executeQuery(query);
+            stmt.executeUpdate(query);
         } catch (SQLException e ) {
             e.printStackTrace(System.err);
         }
@@ -74,7 +74,7 @@ public class SystemsOperations {
             //If database is setup correctly this should cascade and delete any mentions of this department
             String query = "DELETE FROM Degree " +
                     "WHERE Degree_id = " + degreeIdToDelete;
-            stmt.executeQuery(query);
+            stmt.executeUpdate(query);
         } catch (SQLException e) {
             e.printStackTrace(System.err);
         }
@@ -93,7 +93,7 @@ public class SystemsOperations {
             //If database is setup correctly this should cascade and delete any mentions of this department
             String query = "DELETE FROM Modules " +
                     "WHERE Module_id = " + moduleId;
-            stmt.executeQuery(query);
+            stmt.executeUpdate(query);
         } catch (SQLException e) {
             e.printStackTrace(System.err);
         }
@@ -113,7 +113,7 @@ public class SystemsOperations {
             Statement stmt = con.createStatement();
             String query = "INSERT INTO Department " +
                     "VALUES (" + departmentCode + ", " + departmentName + ")";
-            stmt.executeQuery(query);
+            stmt.executeUpdate(query);
         } catch (SQLException e ) {
             e.printStackTrace(System.err);
         }
@@ -140,7 +140,7 @@ public class SystemsOperations {
             if (rs.next()) {
                 query = "INSERT INTO Degree " +
                         "VALUES (" + degreeId + ", " + degreeName + ", " + departmentCode + ")";
-                stmt.executeQuery(query);
+                stmt.executeUpdate(query);
                 return true;
             } else {
                 return false;
@@ -164,10 +164,10 @@ public class SystemsOperations {
                 //First insert into Modules
                 query = "INSERT INTO Modules " +
                         "VALUES ( " + moduleId + ", " + moduleName + ", " + credits + ")";
-                stmt.executeQuery(query);
+                stmt.executeUpdate(query);
                 query = "INSERT INTO Degree_Module_Approved " +
                         "VALUES ( " + degreeId + ", " + level + ", " + moduleId + ", " + boolToInt(compulsory) + ")";
-                stmt.executeQuery(query);
+                stmt.executeUpdate(query);
                 return true;
             } else {
                 return false;
