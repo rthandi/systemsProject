@@ -68,7 +68,7 @@ public class SystemsOperations {
 
     /**
      * @param currentUser The currently logged in user
-     * @param degreeIdToDelete the ID of the degree that is to be deleted
+     * @param degreeIdToDelete The ID of the degree that is to be deleted
      * @param con The open connection to the database
      * @throws SQLException Will print out the error with the database if one is encountered
      */
@@ -91,7 +91,7 @@ public class SystemsOperations {
 
     /**
      * @param currentUser The currently logged in user
-     * @param moduleId the ID of the module that is to be deleted
+     * @param moduleId The ID of the module that is to be deleted
      * @param con The open connection to the database
      * @throws SQLException Will print out the error with the database if one is encountered
      */
@@ -111,6 +111,81 @@ public class SystemsOperations {
             e.printStackTrace(System.err);
         }
     }
+    
+    /**
+     * 
+     * @param currentUser The currently logged in user
+     * @param username The ID of the user that is to be deleted
+     * @param con The open connection to the database
+     * @throws SQLException Will print out the error with the database if one is encountered
+     */
+    public static void deleteUser (User currentUser, String username, Connection con) throws SQLException {
+        try {
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 3
+        	if (permissionCheck(currentUser) >= 3) {
+	            Statement stmt = con.createStatement();
+	            //If database is setup correctly this should cascade and delete any mentions of this department
+	            String query = "DELETE FROM User " +
+	                    "WHERE Username = " + username;
+	            stmt.executeUpdate(query);
+    		} else {
+        		System.out.println("Permission level not high enough to perform this operation");
+        	}
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+        }
+    }
+    
+    /**
+     * 
+     * @param currentUser The currently logged in user
+     * @param username The ID of the user that is to be deleted
+     * @param moduleId The ID of the module that is to be deleted
+     * @param con The open connection to the database
+     * @throws SQLException Will print out the error with the database if one is encountered
+     */
+    public static void deleteStudentModule (User currentUser, String username, String moduleId, Connection con) throws SQLException {
+        try {
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
+        	if (permissionCheck(currentUser) >= 3) {
+	            Statement stmt = con.createStatement();
+	            //If database is setup correctly this should cascade and delete any mentions of this department
+	            String query = "DELETE FROM Student_Module " +
+	                    "WHERE Module_id = " + moduleId + " AND Username = " + username;
+	            stmt.executeUpdate(query);
+    		} else {
+        		System.out.println("Permission level not high enough to perform this operation");
+        	}
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+        }
+    }
+    
+    /**
+     * 
+     * @param currentUser The currently logged in user
+     * @param moduleId The ID of the module that is to be deleted
+     * @param con The open connection to the database
+     * @throws SQLException Will print out the error with the database if one is encountered
+     */
+    public static void deleteDegModAprov (User currentUser, String moduleId, Connection con) throws SQLException {
+        try {
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
+        	if (permissionCheck(currentUser) >= 3) {
+	            Statement stmt = con.createStatement();
+	            //If database is setup correctly this should cascade and delete any mentions of this department
+	            String query = "DELETE FROM Degree_Module_Approved " +
+	                    "WHERE Module_id = " + moduleId;
+	            stmt.executeUpdate(query);
+    		} else {
+        		System.out.println("Permission level not high enough to perform this operation");
+        	}
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+        }
+    }
+    
+    
 
     /**
      * @param currentUser The user that is currently logged in
@@ -204,6 +279,51 @@ public class SystemsOperations {
             return false;
         }
     }
+    
+    /* Commented out as other things need to be created first
+     * 
+     * @param currentUser The currently logged in user
+     * @param username For the new student
+     * @param hash Password hash for user
+     * @param surname Last name of user
+     * @param other names
+     * @param role Student/Teacher/Registrar/Administrator
+     * @param degreeId The ID of the degree to enrol the user onto
+     * @param email Users email
+     * @param tutor Student tutor
+     * @param con The current connection to the database
+     * @return boolean if user addition was a success or not
+     * @throws SQLException
+     
+    public static boolean addUser (User currentUser, String username, String hash, String surname, String other, 
+    		String role, String degreeId, String email, String tutor, Connection con) throws SQLException {
+        try {
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 3
+        	if (permissionCheck(currentUser) >= 3) {
+	            Statement stmt = con.createStatement();
+	            String query = "SELECT Username " +
+	                    "FROM User ";
+	            ResultSet rs = stmt.executeQuery(query);
+	            //Check to see if the inputed username already exists
+	            if (rs.next()) {
+	            	System.out.println("A user with that username already exists");
+	                return false;
+	            } 
+	            else {
+	            	query = "INSERT INTO User " +
+	  		              "VALUES ( " + username + ", " + hash + ", " + surname + ", " + other + ", " + role + ", " + degreeId+ ", " + email + ", " + tutor + ")";
+	                stmt.executeUpdate(query);
+	            	return true;
+	            }
+        	} else {
+        		System.out.println("Permission level not high enough to perform this operation");
+        		return false;
+        	}
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return false;
+        }
+    } */
 
     private static int boolToInt(Boolean bool){
         if (bool){
