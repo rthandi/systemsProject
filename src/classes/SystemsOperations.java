@@ -214,19 +214,19 @@ public class SystemsOperations {
     
     /**
      * 
-     * @param user
+     * @param currentUser The user who is currently logged in
      * @return permission level of the user as an int
      */
     public static int permissionCheck (User currentUser) {
     	String permission = currentUser.getRole();
     	int level = 0;
-    	if (permission == "Student")
+    	if (Objects.equals(permission, "Student"))
     		level = 1;
-    	else if (permission == "Teacher")
+    	else if (Objects.equals(permission, "Teacher"))
     		level = 2;
-    	else if (permission == "Registrar")
+    	else if (Objects.equals(permission, "Registrar"))
     		level = 3;
-    	else if (permission == "Administrator")
+    	else if (Objects.equals(permission, "Administrator"))
     		level = 4;
     	return level;
     	
