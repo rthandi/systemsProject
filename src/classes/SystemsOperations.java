@@ -260,7 +260,14 @@ public class SystemsOperations {
     	return level;
     }
 
-    public static boolean checkRegValid(User currentUser, User userToCheck, Connection con) throws SQLException {
+	/**
+	 * @param currentUser The currently logged in user
+	 * @param userToCheck The user who we want to check is registered for their current level of study or not
+	 * @param con The connection to the database
+	 * @return True if they are correctly registered, false if not.
+	 * @throws SQLException Throws if error with the database
+	 */
+	public static boolean checkRegValid(User currentUser, User userToCheck, Connection con) throws SQLException {
 		Statement stmt = null;
 		ResultSet rsModules = null;
 		ResultSet rsModulesApproved = null;
