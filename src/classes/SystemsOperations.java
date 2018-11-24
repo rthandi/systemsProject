@@ -2,6 +2,7 @@ package classes;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Objects;
@@ -229,8 +230,41 @@ public class SystemsOperations {
     	else if (permission == "Administrator")
     		level = 4;
     	return level;
-    	
     }
+    
+    /**
+	 * Method to take a table for it to be output ot the screen
+	 * @param con Current connection to the database
+	 * @param table To be output
+	 * @param currentUser the User that is currently logged in
+	 * @return dynamically outputs data from the table
+	 */
+	public static void retrieveTable (Connection con, User currentUser, String table) {
+		try {
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 3
+        	if (permissionCheck(currentUser) >= 3) { 
+	            Statement stmt = con.createStatement();
+	            String query = "SELECT * FROM " + table;
+	            
+	            
+	            ResultSet res = stmt.executeQuery(query);
+	            ResultSetMetaData rsmd  = res.getMetaData();
+	    		int numCols = rsmd.getColumnCount();
+	    		
+	    		while (res.next()) {
+	    			for (int i=1; i<=numCols; i++) {
+	    				System.out.print(rsmd.getColumnName(i) + ": ");
+	    				System.out.print(res.getString(i) + "  ");
+	    			}
+	    			System.out.println("");
+	    		}
+        	} else {
+        		System.out.println("Permission level not high enough to perform this operation");
+        	}
+        } catch (SQLException e ) {
+            e.printStackTrace(System.err);
+        }
+	}
 
 // Not currently using but leaving it in if we find it useful later for debugging purposes. Following is taken from oracle docs (I think it should be built into jdbc under JDBCTutorialUtilities however this is not working correctly on mine so someone else should check) - Robbie
 //    public static void printSQLException(SQLException ex) {
