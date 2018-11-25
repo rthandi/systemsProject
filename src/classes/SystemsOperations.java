@@ -50,13 +50,16 @@ public class SystemsOperations {
             con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
             try {
                 Statement stmt = con.createStatement();
+                Statement stmt2 = con.createStatement();
+                ResultSet rs = null;
+                ResultSet rs2 = null;
 
                 String query = "SELECT * FROM User " +
                         "WHERE Username = '" + usernameInput +
                         "' AND Hash = '" + hashInput +"'";
                 //String query = "SELECT * FROM User WHERE Username = 'aca17ab' AND Hash = 'hashsash'";
 
-                ResultSet rs = stmt.executeQuery(query);
+                rs = stmt.executeQuery(query);
                 rs.first();
 
                 String username = rs.getString("Username");
@@ -65,10 +68,14 @@ public class SystemsOperations {
                 String surname = rs.getString("Surname");
                 String otherNames = rs.getString("Other_names");
                 String role = rs.getString("Role");
-                String degreeId = rs.getString("Degree_id");
                 String email = rs.getString("Email");
-                String tutor = rs.getString("Tutor");
-                String level = rs.getString("Level");
+                
+                query = "SELECT * FROM Student " +
+                		"WHERE Username = '" + usernameInput + "'";
+                rs2 = stmt2.executeQuery(query);
+                String degreeId = rs2.getString("Degree_id");
+                String tutor = rs2.getString("Tutor");
+                String level = rs2.getString("Level");
                 char levelChar = level.charAt(0);
 
                 con.close();

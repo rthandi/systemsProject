@@ -21,6 +21,11 @@ public class dropTable {
 				System.out.println("--- Deleting Student_Module");
 				sql = "DROP TABLE Student_Module";
 				stmt.executeUpdate(sql);
+				
+				// Deleting Student
+				System.out.println("--- Deleting Student");
+				sql = "DROP TABLE Student";
+				stmt.executeUpdate(sql);
 
 				// Deleting User
 				System.out.println("--- Deleting User");
