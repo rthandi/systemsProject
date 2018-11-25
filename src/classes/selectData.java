@@ -77,7 +77,7 @@ public class selectData {
 	 		        System.out.print(", Surname: " + surname);
 	 		        System.out.print(", Other: " + other);
 	 		        System.out.print(", Email: " + email);
-	 		        System.out.print(" Role: " + role);
+	 		        System.out.println(" Role: " + role);
 	 		    }
 	 		    res.close();
 	 		    
@@ -94,7 +94,7 @@ public class selectData {
 	 		        System.out.print("Username: " + user);
 	 		        System.out.print(", Degree Id: " + degreeId);
 	 		        System.out.print(", Tutor: " + tutor);
-	 		        System.out.print(", Level: " + level);
+	 		        System.out.println(", Level: " + level);
 	 		    }
 	 		    res.close();
 	 		    
@@ -109,7 +109,7 @@ public class selectData {
   		            //Display values
 	 		        System.out.print("Username: " + user);
 	 		        System.out.print(", Module Id: " + id);
-	 		        System.out.print(", Mark: " + mark);
+	 		        System.out.println(", Mark: " + mark);
 	 		    }
 	 		    res.close();
 	 		    
