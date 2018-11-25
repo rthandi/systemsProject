@@ -44,6 +44,15 @@ public class SystemsOperations {
 			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
 		}
     }
+
+    /**
+     *
+     * @param usernameInput
+     * @param hashInput
+     * @return user from given
+     * @return null if no such user
+     * @throws SQLException if error with the database, should still return null
+     */
 	public static User getUser(String usernameInput, String hashInput) throws SQLException { //will have password hash if that gets done
         Connection con = null;
         try {
@@ -73,6 +82,8 @@ public class SystemsOperations {
                 query = "SELECT * FROM Student " +
                 		"WHERE Username = '" + usernameInput + "'";
                 rs2 = stmt2.executeQuery(query);
+                rs2.first();
+
                 String degreeId = rs2.getString("Degree_id");
                 String tutor = rs2.getString("Tutor");
                 String level = rs2.getString("Level");
@@ -89,6 +100,7 @@ public class SystemsOperations {
             e.printStackTrace();
             return null;
         } finally {
+
             if (con != null) con.close();
         }
     }

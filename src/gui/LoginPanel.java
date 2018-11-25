@@ -35,9 +35,10 @@ public class LoginPanel extends JPanel{
                     } catch (SQLException e1) {
                         e1.printStackTrace();
                     }
-
                     if(user.getRole().equals("Student")){
                         theFrame.toStudentPanel(user);
+                    }else if(user.getRole().equals("Admin")){
+                        theFrame.toAdminPanel(user);
                     }
                 }
             }

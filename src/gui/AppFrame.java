@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class AppFrame extends JFrame {
     public AppFrame() throws HeadlessException {
-        super("University of asd");
+        super("University of Things");
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
@@ -33,6 +33,16 @@ public class AppFrame extends JFrame {
 
         contentPane.revalidate();
         contentPane.repaint();
+    }
+    public void toAdminPanel(User admin){
+        Container contentPane = getContentPane();
+        contentPane.removeAll();
+
+        contentPane.add(new AdminPanel(this,admin));
+
+        contentPane.revalidate();
+        contentPane.repaint();
+
     }
 
 

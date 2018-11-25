@@ -72,7 +72,6 @@ public class dropTable {
 		catch (SQLException ex) {
 		 ex.printStackTrace();
 		}
-
 	}
 
 }
