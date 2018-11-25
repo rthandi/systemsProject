@@ -2,6 +2,7 @@ package classes;
 
 import javax.swing.plaf.nimbus.State;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class SystemsOperations {
@@ -67,9 +68,11 @@ public class SystemsOperations {
                 String degreeId = rs.getString("Degree_id");
                 String email = rs.getString("Email");
                 String tutor = rs.getString("Tutor");
+                String level = rs.getString("Level");
+                char levelChar = level.charAt(0);
 
                 con.close();
-                return new User(username, hash, title, surname, otherNames, role, degreeId, email, tutor);
+                return new User(username, hash, title, surname, otherNames, role, degreeId, email, tutor , levelChar);
             } catch (SQLException e) {
                 e.printStackTrace(System.err);
                 return null;
