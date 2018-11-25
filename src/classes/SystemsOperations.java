@@ -164,6 +164,79 @@ public class SystemsOperations {
 			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
 		}
     }
+   	
+    /**	
+     * 	
+     * @param currentUser The currently logged in user	
+     * @param username The ID of the user that is to be deleted	
+     * @param con The open connection to the database	
+     * @throws SQLException Will print out the error with the database if one is encountered	
+     */	
+    public static void deleteUser (User currentUser, User delUser, Connection con) throws SQLException {	
+        try {	
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 3	
+        	if (permissionCheck(currentUser) >= 3) {	
+	            Statement stmt = con.createStatement();	
+	            //If database is setup correctly this should cascade and delete any mentions of this department	
+	            String query = "DELETE FROM User " +	
+	                    "WHERE Username = " + delUser.getRegistrationNumber();	
+	            stmt.executeUpdate(query);	
+    		} else {	
+        		System.out.println("Permission level not high enough to perform this operation");	
+        	}	
+        } catch (SQLException e) {	
+            e.printStackTrace(System.err);	
+        }	
+    }	
+    	
+    /**	
+     * 	
+     * @param currentUser The currently logged in user	
+     * @param username The ID of the user that is to be deleted	
+     * @param moduleId The ID of the module that is to be deleted	
+     * @param con The open connection to the database	
+     * @throws SQLException Will print out the error with the database if one is encountered	
+     */	
+    public static void deleteStudentModule (User currentUser, User userToRemove, String moduleId, Connection con) throws SQLException {	
+        try {	
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4	
+        	if (permissionCheck(currentUser) >= 3) {	
+	            Statement stmt = con.createStatement();	
+	            //If database is setup correctly this should cascade and delete any mentions of this department	
+	            String query = "DELETE FROM Student_Module " +	
+	                    "WHERE Module_id = " + moduleId + " AND Username = " + userToRemove.getRegistrationNumber();	
+	            stmt.executeUpdate(query);	
+    		} else {	
+        		System.out.println("Permission level not high enough to perform this operation");	
+        	}	
+        } catch (SQLException e) {	
+            e.printStackTrace(System.err);	
+        }	
+    }	
+    	
+    /**	
+     * 	
+     * @param currentUser The currently logged in user	
+     * @param moduleId The ID of the module that is to be deleted	
+     * @param con The open connection to the database	
+     * @throws SQLException Will print out the error with the database if one is encountered	
+     */	
+    public static void deleteDegModAprov (User currentUser, String moduleId, Connection con) throws SQLException {	
+        try {	
+            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4	
+        	if (permissionCheck(currentUser) >= 3) {	
+	            Statement stmt = con.createStatement();	
+	            //If database is setup correctly this should cascade and delete any mentions of this department	
+	            String query = "DELETE FROM Degree_Module_Approved " +	
+	                    "WHERE Module_id = " + moduleId;	
+	            stmt.executeUpdate(query);	
+    		} else {	
+        		System.out.println("Permission level not high enough to perform this operation");	
+        	}	
+        } catch (SQLException e) {	
+            e.printStackTrace(System.err);	
+        }	
+    }
 
     /**
      * @param currentUser The user that is currently logged in
