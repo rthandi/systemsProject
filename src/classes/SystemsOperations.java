@@ -217,19 +217,18 @@ public class SystemsOperations {
      * @param currentUser The user who is currently logged in
      * @return permission level of the user as an int
      */
-    public static int permissionCheck (User currentUser) {
+    private static int permissionCheck(User currentUser) {
     	String permission = currentUser.getRole();
     	int level = 0;
-    	if (Objects.equals(permission, "Student"))
+    	if (permission.equals("Student"))
     		level = 1;
-    	else if (Objects.equals(permission, "Teacher"))
+    	else if (permission.equals("Teacher"))
     		level = 2;
-    	else if (Objects.equals(permission, "Registrar"))
+    	else if (permission.equals("Registrar"))
     		level = 3;
-    	else if (Objects.equals(permission, "Administrator"))
+    	else if (permission.equals("Administrator"))
     		level = 4;
     	return level;
-    	
     }
 
 // Not currently using but leaving it in if we find it useful later for debugging purposes. Following is taken from oracle docs (I think it should be built into jdbc under JDBCTutorialUtilities however this is not working correctly on mine so someone else should check) - Robbie
