@@ -46,9 +46,6 @@ public class SystemsOperations {
     }
 
 
-
-
-
     /**
      * @param currentUser The user that is currently logged in
      * @param departmentToDelete The department code of the department that is to be deleted
@@ -82,24 +79,33 @@ public class SystemsOperations {
      * @param con The open connection to the database
      * @throws SQLException Will print out the error with the database if one is encountered
      */
-    public static void deleteDegree (User currentUser, String degreeIdToDelete, Connection con) throws SQLException{
-		Statement stmt = null;
+    public static void deleteDegree (User currentUser, String degreeIdToDelete) throws SQLException {
+        Statement stmt = null;
+        Connection con = null;
         try {
-            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
-        	if (permissionCheck(currentUser) >= 4) {
-	            stmt = con.createStatement();
-	            //If database is setup correctly this should cascade and delete any mentions of this department
-	            String query = "DELETE FROM Degree " +
-	                    "WHERE Degree_id = " + degreeIdToDelete;
-	            stmt.executeUpdate(query);
-    		} else {
-        		System.out.println("Permission level not high enough to perform this operation");
-        	}
-        } catch (SQLException e) {
-            e.printStackTrace(System.err);
+            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+            try {
+                //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
+                if (permissionCheck(currentUser) >= 4) {
+                    stmt = con.createStatement();
+                    //If database is setup correctly this should cascade and delete any mentions of this department
+                    String query = "DELETE FROM Degree " +
+                            "WHERE Degree_id = '" + degreeIdToDelete + "'";
+                    stmt.executeUpdate(query);
+                } else {
+                    System.out.println("Permission level not high enough to perform this operation");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace(System.err);
+            } finally {
+                try {
+                    if (stmt != null) stmt.close();
+                } catch (Exception e) {
+                }
+            }
         } finally {
-			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
-		}
+            if(con != null) con.close();
+        }
     }
 
     /**
@@ -388,7 +394,6 @@ public class SystemsOperations {
             if(con != null) con.close();
         }
     }
-
 
     //MISC
     /**

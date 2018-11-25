@@ -43,7 +43,6 @@ public class AppFrame extends JFrame {
 
         contentPane.revalidate();
         contentPane.repaint();
-
     }
 
 
