@@ -49,20 +49,28 @@ public class createTable {
 				// Creating User
 				System.out.println("--- Creating User");
 				sql = "CREATE TABLE User " +
-					 "(Username VARCHAR(7) not NULL, " +
+					 "(Username VARCHAR(8) not NULL, " +
 					 " Hash VARCHAR(50) not NULL," +
 					 " Title VARCHAR(5) not NULL, " +
 					 " Surname VARCHAR(50) not NULL, " +
 					 " Other_names VARCHAR(50) not NULL, " +
 					 " Role VARCHAR(15) not NULL," +
-					 " Degree_id VARCHAR(8) not NULL, " +
 					 " Email VARCHAR(50) not NULL, " +
+					 " PRIMARY KEY (Username))";
+					 
+				stmt.executeUpdate(sql);
+				
+				// Creating Student
+				System.out.println("--- Creating Student");
+				sql = "CREATE TABLE Student " +
+					 "(Username VARCHAR(8) not NULL, " +
+					 " Degree_id VARCHAR(8) not NULL, " +
 					 " Tutor VARCHAR(50) not NULL, " +
 					 " Level VARCHAR(1) not NULL, " +
 					 " PRIMARY KEY (Username), " +
-					 " CONSTRAINT Degree_id" +
-						 " FOREIGN KEY (Degree_id)" +
-						 " REFERENCES Degree (Degree_id)" +
+					 " CONSTRAINT username" +
+						 " FOREIGN KEY (Username)" +
+						 " REFERENCES User (Username)" +
 						 " ON DELETE CASCADE ON UPDATE CASCADE)";
 					 
 				stmt.executeUpdate(sql);
@@ -70,10 +78,10 @@ public class createTable {
 				// Creating Student_Module
 				System.out.println("--- Creating Student_Module");
 				sql = "CREATE TABLE Student_Module" +
-					 "(Username VARCHAR(7) not NULL, " +
+					 "(Username VARCHAR(8) not NULL, " +
 					 " Module_id VARCHAR(7) not NULL, " +
 					 " Mark SMALLINT DEFAULT 0, " +
-					 " CONSTRAINT Username" +
+					 " CONSTRAINT Username2" +
 						 " FOREIGN KEY (Username)" +
 						 " REFERENCES User (Username)" +
 						 " ON DELETE CASCADE ON UPDATE CASCADE)";
