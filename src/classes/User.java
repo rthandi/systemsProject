@@ -6,22 +6,28 @@ public class User {
     // USER DATA
 
     private String registrationNumber;
+    private String hash;
     private String title;
     private String surname;
     private String otherNames;
+    private String role;
     private String degreeId;
     private String email;
     private String tutorName;
+    private char level;
 
     //CONSTRUCTOR
-    public User (String registrationNumberInput, String titleInput, String surnameInput, String otherNamesInput, String degreeIdInput, String emailInput, String tutorNameInput){
+    public User (String registrationNumberInput, String hashInput, String titleInput, String surnameInput, String otherNamesInput, String roleInput, String degreeIdInput, String emailInput, String tutorNameInput, char levelInput){
         registrationNumber = registrationNumberInput;
+        hash = hashInput;
         title = titleInput;
         surname = surnameInput;
         otherNames = otherNamesInput;
+        role = roleInput;
         degreeId = degreeIdInput;
         email = emailInput;
         tutorName = tutorNameInput;
+        level = levelInput;
     }
 
     //GETTER METHODS
@@ -36,9 +42,17 @@ public class User {
     public String getOtherNames() {
         return otherNames;
     }
+    
+    public String getRole() {
+    	return role;
+    }
 
     public String getRegistrationNumber() {
         return registrationNumber;
+    }
+    
+    public String getHash() {
+    	return hash;
     }
 
     public String getSurname() {
@@ -51,6 +65,12 @@ public class User {
 
     public String getTutorName() {
         return tutorName;
+    }
+
+    public char getLevel() { return level; }
+
+    public String getFullName(){
+        return (title + " " + otherNames + " " + surname);
     }
 
     //TODO: delete this at the end if not needed

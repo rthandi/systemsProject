@@ -64,20 +64,37 @@ public class selectData {
 	 			while(res.next()){
 	 				//Retrieve by column name
 	 		        String user = res.getString("Username");
+	 		        String hash = res.getString("Hash");
 	 		        String title = res.getString("Title");
 	 		        String surname = res.getString("Surname");
 	 		        String other = res.getString("Other_names");
-	 		        String degreeId = res.getString("Degree_id");
+	 		        String role = res.getString("Role");
 	 		        String email = res.getString("Email");
-	 		        String tutor = res.getString("Tutor");
  		            //Display values
 	 		        System.out.print("Username: " + user);
+	 		        System.out.print(" Hash: " + hash);
 	 		        System.out.print(", Title: " + title);
 	 		        System.out.print(", Surname: " + surname);
 	 		        System.out.print(", Other: " + other);
-	 		        System.out.print(", Degree Id: " + degreeId);
 	 		        System.out.print(", Email: " + email);
-	 		        System.out.println(", Tutor: " + tutor);
+	 		        System.out.println(" Role: " + role);
+	 		    }
+	 		    res.close();
+	 		    
+	 		    // Outputs all entries to Student table
+	 		    System.out.println("\n\n--- Student ---\n");
+	 		    res = stmt.executeQuery("SELECT * FROM Student");
+	 			while(res.next()){
+	 				//Retrieve by column name
+	 		        String user = res.getString("Username");
+	 		        String degreeId = res.getString("Degree_id");
+	 		        String tutor = res.getString("Tutor");
+	 		        String level = res.getString("Level");
+ 		            //Display values
+	 		        System.out.print("Username: " + user);
+	 		        System.out.print(", Degree Id: " + degreeId);
+	 		        System.out.print(", Tutor: " + tutor);
+	 		        System.out.println(", Level: " + level);
 	 		    }
 	 		    res.close();
 	 		    
