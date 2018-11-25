@@ -132,14 +132,14 @@ public class selectData {
 	 		    
 	 		    // Done
 	 		    System.out.println("\n\nAll entries outputted");
-	 		    
-		      
+	 		    con.close();
 			}
 			catch (SQLException ex) {
 			 ex.printStackTrace();
 			}
 			finally {
 			 if (stmt != null) stmt.close();
+			 con.close();
 			}
 
 

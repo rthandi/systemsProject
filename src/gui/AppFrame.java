@@ -3,6 +3,7 @@ import classes.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLException;
 
 
 public class AppFrame extends JFrame {
@@ -34,7 +35,7 @@ public class AppFrame extends JFrame {
         contentPane.revalidate();
         contentPane.repaint();
     }
-    public void toAdminPanel(User admin){
+    public void toAdminPanel(User admin) {
         Container contentPane = getContentPane();
         contentPane.removeAll();
 

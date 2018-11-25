@@ -2,6 +2,7 @@ package gui;
 
 import classes.*;
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,7 @@ public class LoginPanel extends JPanel{
 
     public LoginPanel(AppFrame appFrame) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBorder(BorderFactory.createTitledBorder("Login"));
         theFrame = appFrame;
         usernameField = new JTextField(10);
         passwordField = new JPasswordField(10);

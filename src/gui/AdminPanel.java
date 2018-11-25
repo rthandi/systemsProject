@@ -1,18 +1,52 @@
 package gui;
 import classes.*;
+
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
-public class AdminPanel extends JPanel{
-    public AdminPanel(AppFrame appFrame, User user){
-        JTabbedPane tabPane = new JTabbedPane();
-
+public class AdminPanel extends JTabbedPane{
+    public AdminPanel(AppFrame appFrame, User user) {
         JPanel deleteDeptPanel = new JPanel();
-            deleteDeptPanel.add(new JLabel("Hello there"));
+            deleteDeptPanel.add(new JButton("Kill me"));
+
 
         JPanel deleteDegreePanel = new JPanel();
-            deleteDegreePanel.add(new JLabel("uuggghh"));
+            ArrayList<Degree> degrees = null;
 
-        tabPane.addTab("Delete Department", deleteDeptPanel);
+            try {
+                degrees = SystemsOperations.getDegrees();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
+            JComboBox degreeList = new JComboBox();
+
+            for(Degree x:degrees) {
+                degreeList.addItem(x);
+            }
+            
+            JButton deleteButton = new JButton("Delete");
+            deleteButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Degree chosen = (Degree) degreeList.getSelectedItem();
+
+                    System.out.println(chosen.getDegreeId());
+                }
+            });
+
+            deleteDegreePanel.add(degreeList);
+            deleteDegreePanel.add(deleteButton);
+
+
+        addTab("Delete Department", deleteDeptPanel);
+        add("Delete Degree", deleteDegreePanel);
     }
+
+
+
 }

@@ -21,6 +21,7 @@ public class StudentPanel extends JPanel{
             //degree.setBorder(BorderFactory.createLineBorder(Color.black));
 
             heading.add(name);
+            heading.add(new JSeparator((SwingConstants.VERTICAL)));
             heading.add(degree);
 
         add(heading, BorderLayout.NORTH);
