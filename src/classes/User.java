@@ -84,6 +84,11 @@ public class User {
     //TODO: delete this at the end if not needed
     //SETTER METHODS (MAY NOT NEED SO NOT ADDING YET)
 
+    /**
+     * @param con The current connection to the database
+     * @return true if the user is registered correctly for their current year false if not
+     * @throws SQLException Will throw and return false if there is an error with the database connection
+     */
     public boolean checkRegValid(Connection con) throws SQLException {
         Statement stmt = null;
         ResultSet rsModules = null;
@@ -148,6 +153,9 @@ public class User {
         }
     }
 
+    /**
+     * @return An int value of the permissions of the User
+     */
     public int permissionCheck() {
         String permission = this.getRole();
         int level = 0;

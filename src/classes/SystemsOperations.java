@@ -44,7 +44,7 @@ public class SystemsOperations {
 			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
 		}
     }
-    
+
 	public static User getUser(String usernameInput, String hashInput) throws SQLException { //will have password hash if that gets done
         Connection con = null;
         try {
@@ -440,13 +440,6 @@ public class SystemsOperations {
             return 0;
         }
     }
-    
-    /**
-     * 
-     * @param currentUser The user who is currently logged in
-     * @return permission level of the user as an int
-     */
-    
 
 // Not currently using but leaving it in if we find it useful later for debugging purposes. Following is taken from oracle docs (I think it should be built into jdbc under JDBCTutorialUtilities however this is not working correctly on mine so someone else should check) - Robbie
 //    public static void printSQLException(SQLException ex) {
