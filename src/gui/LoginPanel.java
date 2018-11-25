@@ -1,8 +1,11 @@
+package gui;
+
+import classes.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.sql.SQLException;
 
 
 public class LoginPanel extends JPanel{
@@ -25,12 +28,16 @@ public class LoginPanel extends JPanel{
                 if (command.equals("Submit")){
                     String username = usernameField.getText();
                     String password = passwordField.getText();
-                    ////////////////////password needs to be hashed etc
-                    System.out.println(username);
                     //TODO check if the give username is in the database and if so the User is returned
-                    if(username.equals("student")){
-                        User user = new User();
-                        appFrame.toStudentPanel(user);
+                    User user = null;
+                    try {
+                        user = SystemsOperations.getUser(username, password);
+                    } catch (SQLException e1) {
+                        e1.printStackTrace();
+                    }
+
+                    if(user.getRole().equals("Student")){
+                        theFrame.toStudentPanel(user);
                     }
                 }
             }

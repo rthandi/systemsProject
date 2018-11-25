@@ -1,10 +1,7 @@
 package classes;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
+import javax.swing.plaf.nimbus.State;
+import java.sql.*;
 import java.util.Objects;
 
 public class SystemsOperations {
@@ -46,6 +43,46 @@ public class SystemsOperations {
 			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
 		}
     }
+	public static User getUser(String usernameInput, String hashInput) throws SQLException { //will have password hash if that gets done
+        Connection con = null;
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+            try {
+                Statement stmt = con.createStatement();
+
+                String query = "SELECT * FROM User " +
+                        "WHERE Username = '" + usernameInput +
+                        "' AND Hash = '" + hashInput +"'";
+                //String query = "SELECT * FROM User WHERE Username = 'aca17ab' AND Hash = 'hashsash'";
+
+                ResultSet rs = stmt.executeQuery(query);
+                rs.first();
+
+                String username = rs.getString("Username");
+                String hash = rs.getString("Hash");
+                String title = rs.getString("Title");
+                String surname = rs.getString("Surname");
+                String otherNames = rs.getString("Other_names");
+                String role = rs.getString("Role");
+                String degreeId = rs.getString("Degree_id");
+                String email = rs.getString("Email");
+                String tutor = rs.getString("Tutor");
+
+                con.close();
+                return new User(username, hash, title, surname, otherNames, role, degreeId, email, tutor);
+            } catch (SQLException e) {
+                e.printStackTrace(System.err);
+                return null;
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (con != null) con.close();
+        }
+    }
+
 
 
     /**
