@@ -376,7 +376,7 @@ public class SystemsOperations {
 	 */
 	public static boolean addStudent (User currentUser, User newUser, Connection con) throws SQLException {
 		// Check user privilege
-    	if (SystemsOperations.permissionCheck(currentUser) <= 2) {
+    	if (permissionCheck(currentUser) <= 2) {
     		System.out.println("Permission level not high enough to perform this operation");
     		return false;
     	}
