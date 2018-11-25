@@ -316,6 +316,19 @@ public class SystemsOperations {
 		}
     }
 
+    /**
+     * 
+     * @param currentUser The currently logged in user
+     * @param moduleId The ID of the Module to add
+     * @param moduleName The name of the Module to add
+     * @param credits The amount of Credits the Module will have
+     * @param level The Level of study required to take the Module
+     * @param compulsory Whether the module is compulsory to the degree or not
+     * @param degreeId The ID of the degree to add
+     * @param con The current connection to the database
+     * @return True if successful and false if not successful
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
     public static boolean addModule  (User currentUser, String moduleId, String moduleName, int credits, char level, boolean compulsory, String degreeId, Connection con) throws SQLException {
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -350,6 +363,72 @@ public class SystemsOperations {
         } finally {
 			try { if (rs != null) rs.close(); } catch (Exception e) {}
 			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+		}
+    }
+    
+    /**
+	 * 
+	 * @param currentUser The currently logged in user
+	 * @param newUser The user that is to be added
+	 * @param con The current connection to the database
+	 * @return True if successful and false if not successful
+	 * @throws SQLException Throws and prints the error if there is an issue with the database
+	 */
+	public static boolean addStudent (User currentUser, User newUser, Connection con) throws SQLException {
+		// Check user privilege
+    	if (SystemsOperations.permissionCheck(currentUser) <= 2) {
+    		System.out.println("Permission level not high enough to perform this operation");
+    		return false;
+    	}
+    	Statement stmt = null;
+    	Statement stmt2 = null;
+    	ResultSet users = null;
+    	ResultSet modules = null;
+        try {
+        	//Check to see if the inputed username already exists, if they do, return false
+            stmt = con.createStatement();
+            String query = "SELECT Username " +
+                    "FROM User " +
+					"WHERE Username = " + newUser.getRegistrationNumber();
+            users = stmt.executeQuery(query);
+			if (users.next()){
+				System.out.println("User already exists");
+				return false;
+			}
+			
+			// Find all compulsory modules for student at their level and degree
+ 			query = " SELECT Module_id FROM Degree_Module_Approved " +
+					" WHERE Compulsory = '1' AND Degree_id = " + newUser.getDegreeId() + " AND Level = " + newUser.getLevel();
+			modules = stmt.executeQuery(query);
+            
+			// Insert new Student into User and Student tables
+            query = "INSERT INTO User " +
+  		              "VALUES ( " + newUser.getRegistrationNumber() + ", " + newUser.getHash() + ", " + newUser.getTitle() + ", " + newUser.getSurname() +
+  		              ", " + newUser.getOtherNames() + ", " + newUser.getRole() + ", " + newUser.getEmail() + ")";
+            stmt2 = con.createStatement();
+            stmt2.executeUpdate(query);
+            query = "INSERT INTO Student " +
+            		"VALUES (" + newUser.getRegistrationNumber() + ", " + newUser.getDegreeId() + ", " + newUser.getTutorName() + ", " + newUser.getLevel() +")" ;
+            stmt2.executeUpdate(query);
+            
+            // Enrol student on all compulsory modules
+            String moduleName = null;
+            while (modules.next()) {
+            	moduleName = "'" + modules.getString(1) + "'";
+            	query = "INSERT INTO Student_Module " +
+            			"VALUES ( " + newUser.getRegistrationNumber() + ", " + moduleName + ", '0')";
+            	stmt2.execute(query);
+            }
+            return true;
+        } catch (SQLException e){
+			e.printStackTrace(System.err);
+			return false;
+		} finally {
+			// Close all open resources
+			try { if (users != null) users.close(); } catch (Exception e) {}
+			try { if (modules != null) modules.close(); } catch (Exception e) {}
+			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+			try { if (stmt2 != null) stmt2.close(); } catch (Exception e) {}
 		}
     }
 
