@@ -1,3 +1,4 @@
+package classes;
 // code from GeeksforGeeks
 // https://www.geeksforgeeks.org/sha-256-hash-in-java/
 
