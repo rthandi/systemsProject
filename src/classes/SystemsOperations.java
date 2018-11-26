@@ -304,14 +304,6 @@ public class SystemsOperations {
 		}
     }
 
-    private static int boolToInt(Boolean bool){
-        if (bool){
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
     //GETTING
     /**
      *
