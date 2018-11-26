@@ -54,7 +54,7 @@ public class SystemsOperations {
     public static void deleteDepartment (User currentUser, String departmentToDelete, Connection con) throws SQLException {
 		Statement stmt = null;
 		//TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
-        if (permissionCheck(currentUser) >= 4) {
+        if (currentUser.permissionCheck() >= 4) {
             stmt = con.createStatement();
             //If database is setup correctly this should cascade and delete any mentions of this department
             String query = "DELETE FROM Department " +
@@ -75,7 +75,7 @@ public class SystemsOperations {
     public static void deleteDegree (User currentUser, String degreeIdToDelete, Connection con) throws SQLException {
         Statement stmt = null;
         //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
-        if (permissionCheck(currentUser) >= 4) {
+        if (currentUser.permissionCheck() >= 4) {
             stmt = con.createStatement();
             //If database is setup correctly this should cascade and delete any mentions of this department
             String query = "DELETE FROM Degree " +
