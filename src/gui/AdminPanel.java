@@ -31,27 +31,20 @@ public class AdminPanel extends JTabbedPane{
         //Deletes the selected Department
         deleteDeptButton.addActionListener(new ActionListener(){
             @Override
-            public void actionPerformed(ActionEvent e){
+            public void actionPerformed(ActionEvent e) {
                 Department chosen = (Department) deptList.getSelectedItem();
                 Connection con = null;
                 try {
                     con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
-                    SystemsOperations.deleteDepartment(user, chosen.getDepartmentCode(),con);
+                    SystemsOperations.deleteDepartment(user, chosen.getDepartmentCode(), con);
                     deptList.remove(deptList.getSelectedIndex()); //ewwwwwww
+                    con.close();
                 } catch (SQLException e1) {
                     e1.printStackTrace();
-                }finally{
-                    if(con != null) {
-                        try {
-                            con.close();
-                        } catch (SQLException e1) {
-                            e1.printStackTrace();
-                        }
-                    }
                 }
-
             }
         });
+
 
         deleteDeptPanel.add(deptList);
         deleteDeptPanel.add(deleteDeptButton);
@@ -80,6 +73,7 @@ public class AdminPanel extends JTabbedPane{
                     Connection con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
                     SystemsOperations.deleteDegree(user, chosen.getDegreeId(), con);
                     degreeList.remove(degreeList.getSelectedIndex());
+                    con.close();
                 } catch (SQLException e1) {
                     e1.printStackTrace();
                 }
