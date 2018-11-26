@@ -304,14 +304,6 @@ public class SystemsOperations {
 		}
     }
 
-    private static int boolToInt(Boolean bool){
-        if (bool){
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
     //GETTING
     /**
      *
@@ -422,12 +414,13 @@ public class SystemsOperations {
 	 * @return True if successful and false if not successful
 	 * @throws SQLException Throws and prints the error if there is an issue with the database
 	 */
-	public static boolean addStudent (User currentUser, User newUser, Connection con) throws SQLException {
+	public static boolean addUser (User currentUser, User newUser, Connection con) throws SQLException {
 		// Check user privilege
-    	if (currentUser.permissionCheck() <= 2) {
-    		System.out.println("Permission level not high enough to perform this operation");
-    		return false;
-    	}
+		//if ((permissionCheck(currentUser) <= permissionCheck(newUser)) || (permissionCheck(currentUser) <= 2)) {
+		//		System.out.println("Permission level not high enough to create a user of this permission level");
+		//		return false;
+		//}
+    	//
     	Statement stmt = null;
     	Statement stmt2 = null;
     	ResultSet users = null;
@@ -444,28 +437,33 @@ public class SystemsOperations {
 				return false;
 			}
 			
-			// Find all compulsory modules for student at their level and degree
- 			query = " SELECT Module_id FROM Degree_Module_Approved " +
-					" WHERE Compulsory = '1' AND Degree_id = " + newUser.getDegreeId() + " AND Level = " + newUser.getLevel();
-			modules = stmt.executeQuery(query);
-            
-			// Insert new Student into User and Student tables
+			// Insert new User into User tables
             query = "INSERT INTO User " +
   		              "VALUES ( " + newUser.getRegistrationNumber() + ", " + newUser.getHash() + ", " + newUser.getTitle() + ", " + newUser.getSurname() +
   		              ", " + newUser.getOtherNames() + ", " + newUser.getRole() + ", " + newUser.getEmail() + ")";
             stmt2 = con.createStatement();
             stmt2.executeUpdate(query);
-            query = "INSERT INTO Student " +
-            		"VALUES (" + newUser.getRegistrationNumber() + ", " + newUser.getDegreeId() + ", " + newUser.getTutorName() + ", " + newUser.getLevel() +")" ;
-            stmt2.executeUpdate(query);
+			
+			// If user is a student, perform student specific actions
+			if (newUser.getRole().equals("'Student'")) {
+				// Find all compulsory modules for student at their level and degree
+	 			query = " SELECT Module_id FROM Degree_Module_Approved " +
+						" WHERE Compulsory = '1' AND Degree_id = " + newUser.getDegreeId() + " AND Level = " + newUser.getLevel();
+				modules = stmt.executeQuery(query);
+				
+				// Insert Student into student table
+	            query = "INSERT INTO Student " +
+	            		"VALUES (" + newUser.getRegistrationNumber() + ", " + newUser.getDegreeId() + ", " + newUser.getTutorName() + ", " + newUser.getLevel() +")" ;
+	            stmt2.executeUpdate(query);
             
-            // Enrol student on all compulsory modules
-            String moduleName = null;
-            while (modules.next()) {
-            	moduleName = "'" + modules.getString(1) + "'";
-            	query = "INSERT INTO Student_Module " +
-            			"VALUES ( " + newUser.getRegistrationNumber() + ", " + moduleName + ", '0')";
-            	stmt2.execute(query);
+	            // Enrol student on all compulsory modules
+	            String moduleName = null;
+	            while (modules.next()) {
+	            	moduleName = "'" + modules.getString(1) + "'";
+	            	query = "INSERT INTO Student_Module " +
+	            			"VALUES ( " + newUser.getRegistrationNumber() + ", " + moduleName + ", '0')";
+	            	stmt2.execute(query);
+	            }
             }
             return true;
         } catch (SQLException e){
