@@ -416,11 +416,11 @@ public class SystemsOperations {
 	 */
 	public static boolean addUser (User currentUser, User newUser, Connection con) throws SQLException {
 		// Check user privilege
-		//if ((permissionCheck(currentUser) <= permissionCheck(newUser)) || (permissionCheck(currentUser) <= 2)) {
-		//		System.out.println("Permission level not high enough to create a user of this permission level");
-		//		return false;
-		//}
-    	//
+		if ((currentUser.permissionCheck() <= newUser.permissionCheck()) || (currentUser.permissionCheck() <= 2)) {
+				System.out.println("Permission level not high enough to create a user of this permission level");
+				return false;
+		}
+    	
     	Statement stmt = null;
     	Statement stmt2 = null;
     	ResultSet users = null;
