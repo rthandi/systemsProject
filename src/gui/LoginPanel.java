@@ -32,7 +32,6 @@ public class LoginPanel extends JPanel{
                     String password = passwordField.getText();
                     User user = null;
                     try {
-                        System.out.println("hello?");
                         user = SystemsOperations.getUser(username, password);
                         if(user.getRole().equals("Student")){
                             theFrame.toStudentPanel(user);

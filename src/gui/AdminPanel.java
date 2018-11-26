@@ -80,12 +80,47 @@ public class AdminPanel extends JTabbedPane{
             }
         });
 
+
         deleteDegreePanel.add(degreeList);
         deleteDegreePanel.add(deleteDegButton);
 
+    //Add a department
+    JPanel addDeptPanel = new JPanel();
+        addDeptPanel.setLayout(new BoxLayout(addDeptPanel, BoxLayout.Y_AXIS));
 
-        addTab("Delete Department", deleteDeptPanel);
-        add("Delete Degree", deleteDegreePanel);
+        addDeptPanel.add(new JLabel("Department Code:"));
+        JTextField deptCodeField = new JTextField(3);
+        addDeptPanel.add(deptCodeField);
+
+        addDeptPanel.add(new JLabel("Department Name:"));
+        JTextField deptNameField = new JTextField(20);
+        addDeptPanel.add(deptNameField);
+
+        JButton submitButton = new JButton("Submit");
+        submitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String command = e.getActionCommand();
+                if (command.equals("Submit")){
+                    try {
+                        Connection con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+                        String deptCode = deptCodeField.getText();
+                        String deptName = deptNameField.getText();
+
+                        SystemsOperations.addDepartment(user, deptCode, deptName, con);
+
+                        con.close();
+                    } catch (SQLException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+        addDeptPanel.add(submitButton);
+
+    add("Add Department", addDeptPanel);
+    addTab("Delete Department", deleteDeptPanel);
+    add("Delete Degree", deleteDegreePanel);
     }
 
 }

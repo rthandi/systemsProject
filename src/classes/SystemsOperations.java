@@ -202,7 +202,7 @@ public class SystemsOperations {
         	if (currentUser.permissionCheck() >= 4) {
 	            stmt = con.createStatement();
 	            String query = "INSERT INTO Department " +
-	                    "VALUES (" + departmentCode + ", " + departmentName + ")";
+	                    "VALUES (" + departmentCode + "," + departmentName + ")";
 	            stmt.executeUpdate(query);
         	} else {
         		System.out.println("Permission level not high enough to perform this operation");
@@ -480,13 +480,6 @@ public class SystemsOperations {
 		}
     }
 
-    private static int boolToInt(Boolean bool){
-        if (bool){
-            return 1;
-        } else {
-            return 0;
-        }
-    }
 
 // Not currently using but leaving it in if we find it useful later for debugging purposes. Following is taken from oracle docs (I think it should be built into jdbc under JDBCTutorialUtilities however this is not working correctly on mine so someone else should check) - Robbie
 //    public static void printSQLException(SQLException ex) {
