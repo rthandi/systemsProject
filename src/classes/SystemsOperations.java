@@ -44,22 +44,23 @@ public class SystemsOperations {
 			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
 		}
     }
-	public static User getUser(String usernameInput, String hashInput) throws SQLException { //will have password hash if that gets done
+	
+    public static User getUser(String usernameInput, String hashInput) throws SQLException { //will have password hash if that gets done
         Connection con = null;
-        try {
+	try {
             con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
             try {
-                Statement stmt = con.createStatement();
-                Statement stmt2 = con.createStatement();
+                PreparedStatement stmt = null;
+                PreparedStatement stmt2 = null;
                 ResultSet rs = null;
                 ResultSet rs2 = null;
-
-                String query = "SELECT * FROM User " +
-                        "WHERE Username = '" + usernameInput +
-                        "' AND Hash = '" + hashInput +"'";
-                //String query = "SELECT * FROM User WHERE Username = 'aca17ab' AND Hash = 'hashsash'";
-
-                rs = stmt.executeQuery(query);
+                
+                stmt = con.prepareStatement("SELECT * FROM User WHERE Username = ? AND Hash = ?");
+                stmt.setString(1, usernameInput);
+                stmt.setString(2, hashInput);
+                stmt.executeUpdate();
+                
+                rs = stmt.executeQuery();
                 rs.first();
 
                 String username = rs.getString("Username");
@@ -70,14 +71,16 @@ public class SystemsOperations {
                 String role = rs.getString("Role");
                 String email = rs.getString("Email");
                 
-                query = "SELECT * FROM Student " +
-                		"WHERE Username = '" + usernameInput + "'";
-                rs2 = stmt2.executeQuery(query);
+                stmt2 = con.prepareStatement("SELECT * FROM User WHERE Username = ?");
+                stmt2.setString(1,usernameInput);
+                stmt2.executeUpdate();
+                
+                rs2 = stmt2.executeQuery();
                 String degreeId = rs2.getString("Degree_id");
                 String tutor = rs2.getString("Tutor");
                 String level = rs2.getString("Level");
                 char levelChar = level.charAt(0);
-
+		    
                 con.close();
                 return new User(username, hash, title, surname, otherNames, role, degreeId, email, tutor , levelChar);
             } catch (SQLException e) {
@@ -92,9 +95,7 @@ public class SystemsOperations {
             if (con != null) con.close();
         }
     }
-
-
-
+	
     /**
      * @param currentUser The user that is currently logged in
      * @param departmentToDelete The department code of the department that is to be deleted
