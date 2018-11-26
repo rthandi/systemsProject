@@ -108,9 +108,9 @@ public class User {
 //            TODO: Apparently Credits cannot be found need to fix this at some point
             String query = "SELECT Credits " +
                     "FROM Student_Module " +
-                    "WHERE Username = '" + this.getRegistrationNumber() +
-                    "' INNER JOIN Modules " +
-                    " ON Student_Module.Module_id = Modules.Module_id";
+                    " INNER JOIN Modules " +
+                    " ON Student_Module.Module_id = Modules.Module_id " +
+                    "WHERE Username = '" + this.getRegistrationNumber() + "'";
             //Insert sql query to get the modules that the user is doing
             rs = stmt.executeQuery(query);
             // Iterate over the ResultSet to total up the credits
@@ -257,12 +257,12 @@ public class User {
             }
             //Now we fetch the details of the module
             stmt = con.createStatement();
-            String query = "SELECT Module_id, Credits " +
+            String query = "SELECT Modules.Module_id, Credits " +
                     "FROM Degree_Module_Approved " +
                     //Checking for degree, optional, and level so we can confirm all of these are correct all in one go when we check if rs.next exists
-                    "WHERE Module_id = '" + moduleId + "' AND Degree_id = '" + this.getDegreeId() + "' AND Compulsory = '0' AND Level = '" + this.getLevel() + "'" +
                     "INNER JOIN Modules " +
-                    "ON Degree_Module_Approved.Module_id = Modules.Module_id";
+                    "ON Degree_Module_Approved.Module_id = Modules.Module_id " +
+                    "WHERE Modules.Module_id = '" + moduleId + "' AND Degree_id = '" + this.getDegreeId() + "' AND Compulsory = '0' AND Level = '" + this.getLevel() + "'";
             rs = stmt.executeQuery(query);
             //Check that module exists
             if (rs.next()){
