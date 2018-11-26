@@ -16,15 +16,14 @@ public class Degree {
     public String getDegreeId() {
         return degreeId;
     }
-
     public String getDegreeName() {
         return degreeName;
     }
-
     public String getDeptCode() {
         return deptCode;
     }
 
+    @Override
     public String toString(){
         return degreeName;
     }

@@ -55,22 +55,16 @@ public class SystemsOperations {
     //DELETION OPERATIONS
     public static void deleteDepartment (User currentUser, String departmentToDelete, Connection con) throws SQLException {
 		Statement stmt = null;
-        try {
-            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
-        	if (permissionCheck(currentUser) >= 4) { 
-	            stmt = con.createStatement();
-	            //If database is setup correctly this should cascade and delete any mentions of this department
-	            String query = "DELETE FROM Department " +
-	                    "WHERE Department_Code = " + departmentToDelete;
-	            stmt.executeUpdate(query);
-        	} else {
-        		System.out.println("Permission level not high enough to perform this operation");
-        	}
-        } catch (SQLException e ) {
-            e.printStackTrace(System.err);
-        } finally {
-			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
-		}
+		//TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
+        if (permissionCheck(currentUser) >= 4) {
+            stmt = con.createStatement();
+            //If database is setup correctly this should cascade and delete any mentions of this department
+            String query = "DELETE FROM Department " +
+                    "WHERE Department_Code = '" + departmentToDelete + "'";
+            stmt.executeUpdate(query);
+        } else {
+            System.out.println("Permission level not high enough to perform this operation");
+        }
     }
 
     /**
@@ -79,32 +73,17 @@ public class SystemsOperations {
      * @param con The open connection to the database
      * @throws SQLException Will print out the error with the database if one is encountered
      */
-    public static void deleteDegree (User currentUser, String degreeIdToDelete) throws SQLException {
+    public static void deleteDegree (User currentUser, String degreeIdToDelete, Connection con) throws SQLException {
         Statement stmt = null;
-        Connection con = null;
-        try {
-            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
-            try {
-                //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
-                if (permissionCheck(currentUser) >= 4) {
-                    stmt = con.createStatement();
-                    //If database is setup correctly this should cascade and delete any mentions of this department
-                    String query = "DELETE FROM Degree " +
-                            "WHERE Degree_id = '" + degreeIdToDelete + "'";
-                    stmt.executeUpdate(query);
-                } else {
-                    System.out.println("Permission level not high enough to perform this operation");
-                }
-            } catch (SQLException e) {
-                e.printStackTrace(System.err);
-            } finally {
-                try {
-                    if (stmt != null) stmt.close();
-                } catch (Exception e) {
-                }
-            }
-        } finally {
-            if(con != null) con.close();
+        //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
+        if (permissionCheck(currentUser) >= 4) {
+            stmt = con.createStatement();
+            //If database is setup correctly this should cascade and delete any mentions of this department
+            String query = "DELETE FROM Degree " +
+                    "WHERE Degree_id = '" + degreeIdToDelete + "'";
+            stmt.executeUpdate(query);
+        } else {
+            System.out.println("Permission level not high enough to perform this operation");
         }
     }
 
@@ -395,6 +374,32 @@ public class SystemsOperations {
         }
     }
 
+    public static ArrayList<Department> getDept() throws SQLException{
+        Connection con = null;
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+            try {
+                ArrayList<Department> depts = new ArrayList<>();
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM Department");
+                while (rs.next()) {
+                    String id = rs.getString("Department_Code");
+                    String name = rs.getString("Department_Name");
+                    depts.add(new Department(id, name));
+                }
+                con.close();
+                return depts;
+            } catch (SQLException e) {
+                e.printStackTrace(System.err);
+                return null;
+            }
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return null;
+        }finally {
+            if(con != null) con.close();
+        }
+	}
     //MISC
     /**
      * 

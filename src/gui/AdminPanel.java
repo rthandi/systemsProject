@@ -11,11 +11,53 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class AdminPanel extends JTabbedPane{
-    public AdminPanel(AppFrame appFrame, User user){
-        JPanel deleteDeptPanel = new JPanel();
-        deleteDeptPanel.add(new JButton("Kill me"));
+    public AdminPanel(AppFrame appFrame, User user) throws SQLException {
 
-        JPanel deleteDegreePanel = new JPanel();
+
+    //DELETE DEPARTMENT PANEL
+    JPanel deleteDeptPanel = new JPanel();
+        ArrayList<Department> depts = null;
+        try{
+            depts = SystemsOperations.getDept();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        JComboBox deptList = new JComboBox();
+
+        for(Department d:depts){
+            deptList.addItem(d);
+        }
+        JButton deleteDeptButton = new JButton("Delete");
+        //Deletes the selected Department
+        deleteDeptButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                Department chosen = (Department) deptList.getSelectedItem();
+                Connection con = null;
+                try {
+                    con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+                    SystemsOperations.deleteDepartment(user, chosen.getDepartmentCode(),con);
+                    deptList.remove(deptList.getSelectedIndex()); //ewwwwwww
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }finally{
+                    if(con != null) {
+                        try {
+                            con.close();
+                        } catch (SQLException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+
+            }
+        });
+
+        deleteDeptPanel.add(deptList);
+        deleteDeptPanel.add(deleteDeptButton);
+
+    //DELETE DEGREE PANEL
+    JPanel deleteDegreePanel = new JPanel();
         ArrayList<Degree> degrees = null;
         try {
             degrees = SystemsOperations.getDegrees();
@@ -24,18 +66,20 @@ public class AdminPanel extends JTabbedPane{
         }
         JComboBox degreeList = new JComboBox();
 
-        for(Degree x:degrees) {
-            degreeList.addItem(x);
+        for(Degree d:degrees) {
+            degreeList.addItem(d);
         }
 
-        JButton deleteButton = new JButton("Delete");
+        JButton deleteDegButton = new JButton("Delete");
         //Deletes the selected Degree
-        deleteButton.addActionListener(new ActionListener() {
+        deleteDegButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e){
                 Degree chosen = (Degree) degreeList.getSelectedItem();
                 try {
-                    SystemsOperations.deleteDegree(user, chosen.getDegreeId());
+                    Connection con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+                    SystemsOperations.deleteDegree(user, chosen.getDegreeId(), con);
+                    degreeList.remove(degreeList.getSelectedIndex());
                 } catch (SQLException e1) {
                     e1.printStackTrace();
                 }
@@ -43,10 +87,11 @@ public class AdminPanel extends JTabbedPane{
         });
 
         deleteDegreePanel.add(degreeList);
-        deleteDegreePanel.add(deleteButton);
+        deleteDegreePanel.add(deleteDegButton);
 
 
         addTab("Delete Department", deleteDeptPanel);
         add("Delete Degree", deleteDegreePanel);
     }
+
 }

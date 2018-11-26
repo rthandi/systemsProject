@@ -35,7 +35,7 @@ public class AppFrame extends JFrame {
         contentPane.revalidate();
         contentPane.repaint();
     }
-    public void toAdminPanel(User admin) {
+    public void toAdminPanel(User admin) throws SQLException {
         Container contentPane = getContentPane();
         contentPane.removeAll();
 
