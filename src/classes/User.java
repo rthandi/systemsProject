@@ -24,7 +24,8 @@ public class User {
     private String tutorName;
     private char level;
 
-    //CONSTRUCTOR
+    //CONSTRUCTORS
+    //Student
     public User (String registrationNumberInput, String hashInput, String titleInput, String surnameInput, String otherNamesInput, String roleInput, String degreeIdInput, String emailInput, String tutorNameInput, char levelInput){
         registrationNumber = registrationNumberInput;
         hash = hashInput;
@@ -38,6 +39,17 @@ public class User {
         level = levelInput;
     }
 
+    //non student
+    public User (String usernameInput, String hashInput, String titleInput, String surnameInput, String otherNamesInput, String roleInput, String emailInput){
+        registrationNumber = usernameInput;
+        hash = hashInput;
+        title = titleInput;
+        surname = surnameInput;
+        otherNames = otherNamesInput;
+        role = roleInput;
+        email = emailInput;
+
+    }
     //GETTER METHODS
     public String getDegreeId() {
         return degreeId;

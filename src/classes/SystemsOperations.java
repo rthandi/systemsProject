@@ -44,58 +44,6 @@ public class SystemsOperations {
 			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
 		}
     }
-
-	public static User getUser(String usernameInput, String hashInput) throws SQLException { //will have password hash if that gets done
-        Connection con = null;
-        try {
-            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
-            try {
-                Statement stmt = con.createStatement();
-                Statement stmt2 = con.createStatement();
-                ResultSet rs = null;
-                ResultSet rs2 = null;
-
-                String query = "SELECT * FROM User " +
-                        "WHERE Username = '" + usernameInput +
-                        "' AND Hash = '" + hashInput +"'";
-                //String query = "SELECT * FROM User WHERE Username = 'aca17ab' AND Hash = 'hashsash'";
-
-                rs = stmt.executeQuery(query);
-                rs.first();
-
-                String username = rs.getString("Username");
-                String hash = rs.getString("Hash");
-                String title = rs.getString("Title");
-                String surname = rs.getString("Surname");
-                String otherNames = rs.getString("Other_names");
-                String role = rs.getString("Role");
-                String email = rs.getString("Email");
-                
-                query = "SELECT * FROM Student " +
-                		"WHERE Username = '" + usernameInput + "'";
-                rs2 = stmt2.executeQuery(query);
-                String degreeId = rs2.getString("Degree_id");
-                String tutor = rs2.getString("Tutor");
-                String level = rs2.getString("Level");
-                char levelChar = level.charAt(0);
-
-                con.close();
-                return new User(username, hash, title, surname, otherNames, role, degreeId, email, tutor , levelChar);
-            } catch (SQLException e) {
-                e.printStackTrace(System.err);
-                return null;
-
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if (con != null) con.close();
-        }
-    }
-
-
-
     /**
      * @param currentUser The user that is currently logged in
      * @param departmentToDelete The department code of the department that is to be deleted
@@ -105,22 +53,17 @@ public class SystemsOperations {
     //DELETION OPERATIONS
     public static void deleteDepartment (User currentUser, String departmentToDelete, Connection con) throws SQLException {
 		Statement stmt = null;
-        try {
-            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
-        	if (currentUser.permissionCheck() >= 4) { 
-	            stmt = con.createStatement();
-	            //If database is setup correctly this should cascade and delete any mentions of this department
-	            String query = "DELETE FROM Department " +
-	                    "WHERE Department_Code = " + departmentToDelete;
-	            stmt.executeUpdate(query);
-        	} else {
-        		System.out.println("Permission level not high enough to perform this operation");
-        	}
-        } catch (SQLException e ) {
-            e.printStackTrace(System.err);
-        } finally {
-			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
-		}
+		//TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
+        if (currentUser.permissionCheck() >= 4) {
+            stmt = con.createStatement();
+            //If database is setup correctly this should cascade and delete any mentions of this department
+            String query = "DELETE FROM Department " +
+                    "WHERE Department_Code = '" + departmentToDelete + "'";
+            stmt.executeUpdate(query);
+        } else {
+            System.out.println("Permission level not high enough to perform this operation");
+        }
+
     }
 
     /**
@@ -129,24 +72,18 @@ public class SystemsOperations {
      * @param con The open connection to the database
      * @throws SQLException Will print out the error with the database if one is encountered
      */
-    public static void deleteDegree (User currentUser, String degreeIdToDelete, Connection con) throws SQLException{
-		Statement stmt = null;
-        try {
-            //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
-        	if (currentUser.permissionCheck() >= 4) {
-	            stmt = con.createStatement();
-	            //If database is setup correctly this should cascade and delete any mentions of this department
-	            String query = "DELETE FROM Degree " +
-	                    "WHERE Degree_id = " + degreeIdToDelete;
-	            stmt.executeUpdate(query);
-    		} else {
-        		System.out.println("Permission level not high enough to perform this operation");
-        	}
-        } catch (SQLException e) {
-            e.printStackTrace(System.err);
-        } finally {
-			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
-		}
+    public static void deleteDegree (User currentUser, String degreeIdToDelete, Connection con) throws SQLException {
+        Statement stmt = null;
+        //TODO: if statement here to check correct user privileges. Not sure how we are doing this yet - 4
+        if (currentUser.permissionCheck() >= 4) {
+            stmt = con.createStatement();
+            //If database is setup correctly this should cascade and delete any mentions of this department
+            String query = "DELETE FROM Degree " +
+                    "WHERE Degree_id = '" + degreeIdToDelete + "'";
+            stmt.executeUpdate(query);
+        } else {
+            System.out.println("Permission level not high enough to perform this operation");
+        }
     }
 
     /**
@@ -366,7 +303,117 @@ public class SystemsOperations {
 			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
 		}
     }
-    
+
+    private static int boolToInt(Boolean bool){
+        if (bool){
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    //GETTING
+    /**
+     *
+     * @param usernameInput
+     * @param hashInput
+     * @return user from given
+     * @return null if no such user
+     * @throws SQLException if error with the database, should still return null
+     */
+    public static User getUser(String usernameInput, String hashInput) throws SQLException { //will have password hash if that gets done
+        Connection con = null;
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+            try {
+                Statement stmt = con.createStatement();
+                ResultSet rs = null;
+
+                String query = "SELECT * FROM User " +
+                        "WHERE Username = '" + usernameInput +
+                        "' AND Hash = '" + hashInput +"'";
+                //String query = "SELECT * FROM User WHERE Username = 'aca17ab' AND Hash = 'hashsash'";
+
+                rs = stmt.executeQuery(query);
+                rs.first();
+
+                String username = rs.getString("Username");
+                String hash = rs.getString("Hash");
+                String title = rs.getString("Title");
+                String surname = rs.getString("Surname");
+                String otherNames = rs.getString("Other_names");
+                String role = rs.getString("Role");
+                String email = rs.getString("Email");
+                con.close();
+                return new User(username, hash, title, surname, otherNames, role, email);
+            } catch (SQLException e) {
+                e.printStackTrace(System.err);
+                return null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (con != null) con.close();
+        }
+    }
+
+    public static ArrayList<Degree> getDegrees() throws SQLException{
+        Connection con = null;
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+            try {
+                ArrayList<Degree> degrees = new ArrayList<>();
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM Degree");
+                while (rs.next()) {
+                    String id = rs.getString("Degree_id");
+                    String name = rs.getString("Degree_Name");
+                    String code = rs.getString("Department_Code");
+                    degrees.add(new Degree(id, name, code));
+                }
+                con.close();
+                return degrees;
+            } catch (SQLException e) {
+                e.printStackTrace(System.err);
+                return null;
+            }
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return null;
+        }finally {
+            if(con != null) con.close();
+        }
+    }
+
+    public static ArrayList<Department> getDept() throws SQLException{
+        Connection con = null;
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+            try {
+                ArrayList<Department> depts = new ArrayList<>();
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM Department");
+                while (rs.next()) {
+                    String id = rs.getString("Department_Code");
+                    String name = rs.getString("Department_Name");
+                    depts.add(new Department(id, name));
+                }
+                con.close();
+                return depts;
+            } catch (SQLException e) {
+                e.printStackTrace(System.err);
+                return null;
+            }
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return null;
+        }finally {
+            if(con != null) con.close();
+        }
+	}
+    //MISC
+
     /**
 	 * 
 	 * @param currentUser The currently logged in user
