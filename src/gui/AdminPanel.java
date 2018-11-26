@@ -45,7 +45,6 @@ public class AdminPanel extends JTabbedPane{
             }
         });
 
-
         deleteDeptPanel.add(deptList);
         deleteDeptPanel.add(deleteDeptButton);
 
@@ -58,7 +57,6 @@ public class AdminPanel extends JTabbedPane{
             e.printStackTrace();
         }
         JComboBox degreeList = new JComboBox();
-
         for(Degree d:degrees) {
             degreeList.addItem(d);
         }
@@ -84,8 +82,9 @@ public class AdminPanel extends JTabbedPane{
         deleteDegreePanel.add(deleteDegButton);
 
 
-        addTab("Delete Department", deleteDeptPanel);
-        add("Delete Degree", deleteDegreePanel);
+    //
+    addTab("Delete Department", deleteDeptPanel);
+    addTab("Delete Degree", deleteDegreePanel);
     }
 
 }
