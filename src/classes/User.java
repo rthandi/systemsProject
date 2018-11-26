@@ -226,6 +226,64 @@ public class User {
             try { if (stmt != null) stmt.close(); } catch (Exception e) {}
         }
     }
+    
+    /**
+     * 
+     * @param con The current connection to the database
+     * @return The total mean grade for the current period of study
+     * @throws SQLException will throw if an SQL error is encountered
+     */
+    public int calculateMeanGrade(Connection con) throws SQLException{
+        Statement stmt = null;
+        Statement stmt2 = null;
+        Statement stmt3 = null;
+        ResultSet modules = null;
+        ResultSet studentModules = null;
+        ResultSet credits = null;
+        ArrayList<String> moduleArray = new ArrayList<>();
+        int total = 0;
+        try {
+        	stmt = con.createStatement();
+        	String query = "SELECT Module_id FROM Degree_Module_Approved " +
+        				   "WHERE Level = " + this.getLevel() + " AND Degree_id = " + this.getDegreeId();
+        	modules = stmt.executeQuery(query);
+        	while (modules.next()) {
+        		moduleArray.add(modules.getString("Module_id"));
+        	}
+        	
+        	stmt2 = con.createStatement();
+        	query = "SELECT * FROM Student_Module " +
+        			"WHERE Username = " + this.getRegistrationNumber();
+        	studentModules = stmt2.executeQuery(query);
+        	
+        	while (studentModules.next()) {
+        		System.out.println(studentModules.getString("Module_id"));
+        		if (moduleArray.contains(studentModules.getString("Module_id"))) {
+        			stmt3 = con.createStatement();
+        			query = "SELECT Credits FROM Modules " +
+        					"WHERE Module_id = '" + studentModules.getString("Module_id") + "'";
+        			credits = stmt3.executeQuery(query);
+        			while (credits.next()) {
+        				//System.out.println(credits.getInt("Credits"));
+        				total += (studentModules.getInt("Mark") * (credits.getFloat("Credits")/120));
+        				System.out.println(total);
+        		//		return total;
+        			}
+        		}
+        	}
+        	return total;
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return (total);
+        } finally {
+            try { if (modules != null) modules.close(); } catch (Exception e) {}
+            try { if (studentModules != null) modules.close(); } catch (Exception e) {}
+            try { if (credits != null) modules.close(); } catch (Exception e) {}
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+            try { if (stmt2 != null) stmt.close(); } catch (Exception e) {}
+            try { if (stmt3 != null) stmt.close(); } catch (Exception e) {}
+        }
+    }
 
     /**
      * @return An int value of the permissions of the User
