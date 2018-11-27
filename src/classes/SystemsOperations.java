@@ -550,6 +550,27 @@ public class SystemsOperations {
         }
     }
 
+    /**
+     * @param currentUser The currently logged in user
+     * @param userToUpdate The user that we want to update the grades for
+     * @param moduleId The module that we are updating the grade for
+     * @param resit Specifies whether it is a resit and therefore needs to be capped at 40% (0 if not resit, 1 if it is. Resit years are not capped afaik)
+     * @param grade The grade the user obtained
+     * @param con The currently open connection to the database
+     * @return Returns true if it is successful and false if it is not
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
+    public static boolean updateGrades (User currentUser, User userToUpdate, String moduleId, Boolean resit, int grade, Connection con) throws SQLException {
+        try {
+            //check user privilege
+            //Lazy operator so will only run the update grades if the privilege check passes
+            return currentUser.permissionCheck() >= 2 && userToUpdate.updateGrades(moduleId, resit, grade, con);
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+            return false;
+        }
+    }
+
 // Not currently using but leaving it in if we find it useful later for debugging purposes. Following is taken from oracle docs (I think it should be built into jdbc under JDBCTutorialUtilities however this is not working correctly on mine so someone else should check) - Robbie
 //    public static void printSQLException(SQLException ex) {
 //        for (Throwable e : ex) {
