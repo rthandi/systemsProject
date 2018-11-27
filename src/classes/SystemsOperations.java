@@ -6,13 +6,16 @@ import java.util.Objects;
 
 public class SystemsOperations {
 
+
+    /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\DELETING OPERATIONS\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
     /**
      * @param currentUser The user that is currently logged in
      * @param departmentToDelete The department code of the department that is to be deleted
      * @param con Current connection to the database
      * @throws SQLException Will print out the error with the database if one is encountered
      */
-    //DELETION OPERATIONS
     public static void deleteDepartment (User currentUser, String departmentToDelete, Connection con) throws SQLException {
 		Statement stmt;
         if (currentUser.permissionCheck() >= 4) {
@@ -142,13 +145,38 @@ public class SystemsOperations {
     }
 
     /**
+     * @param currentUser The currently logged in user
+     * @param userToDropFrom The user that we want to drop the module from
+     * @param moduleId The id of the module we want to drop from the user
+     * @param con The current connection to the database
+     * @return True if it was dropped correctly, false if not
+     * @throws SQLException Will throw an SQLException and return false if it encounters an error
+     */
+    public static boolean dropOptionalModuleFromUser(User currentUser, User userToDropFrom, String moduleId, Connection con) throws SQLException {
+        //Check permissions of logged in user
+        if (currentUser.permissionCheck() >= 3){
+            try {
+                return userToDropFrom.dropOptionalModule(moduleId, con);
+            } catch (SQLException e){
+                e.printStackTrace(System.err);
+                return false;
+            }
+        }
+        return false;
+    }
+
+
+    /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\ADDING OPERATIONS\\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
+
+    /**
      * @param currentUser The user that is currently logged in
      * @param departmentCode The code of the department that is being added
      * @param departmentName The name of the department that is being added
      * @param con Current connection to the database
      * @throws SQLException Will print out the error with the database if one is encountered
      */
-    //ADDING OPERATIONS
     public static void addDepartment (User currentUser, String departmentCode, String departmentName, Connection con) throws SQLException {
 		Statement stmt;
         try {
@@ -252,7 +280,15 @@ public class SystemsOperations {
 			try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}}
     }
 
-    public static boolean addModuleToUser(User currentUser, User userToAddTo, String moduleId, Connection con) throws SQLException {
+    /**
+     * @param currentUser The currently logged in user
+     * @param userToAddTo The user we want to add the module to
+     * @param moduleId The module we want to add to the specified user
+     * @param con The currently open connection to the database
+     * @return True if it was successful, false if not
+     * @throws SQLException Will throw and return false if there is an issue with the database
+     */
+    public static boolean addOptionalModuleToUser(User currentUser, User userToAddTo, String moduleId, Connection con) throws SQLException {
         //Check permissions of logged in user
         if (currentUser.permissionCheck() >= 3){
             try {
@@ -265,7 +301,71 @@ public class SystemsOperations {
         return false;
     }
 
-    //GETTING
+    /**
+     *
+     * @param currentUser The currently logged in user
+     * @param newUser The user that is to be added
+     * @param con The current connection to the database
+     * @return True if successful and false if not successful
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
+    public static boolean addStudent (User currentUser, User newUser, Connection con) throws SQLException {
+        // Check user privilege
+        if (currentUser.permissionCheck() <= 2) {
+            System.out.println("Permission level not high enough to perform this operation");
+            return false;
+        }
+        Statement stmt = null;
+        Statement stmt2 = null;
+        ResultSet users = null;
+        ResultSet modules = null;
+        try {
+            //Check to see if the inputted username already exists, if they do, return false
+            stmt = con.createStatement();
+            String query = "SELECT Username " +
+                    "FROM User " +
+                    "WHERE Username = '" + newUser.getRegistrationNumber() + "'";
+            users = stmt.executeQuery(query);
+            if (users.next()){
+                System.out.println("User already exists");
+                return false;
+            }
+
+            // Find all compulsory modules for student at their level and degree
+            query = " SELECT Module_id FROM Degree_Module_Approved " +
+                    " WHERE Compulsory = '1' AND Degree_id = '" + newUser.getDegreeId() + "' AND Level = '" + newUser.getLevel() + "'";
+            modules = stmt.executeQuery(query);
+
+            // Insert new Student into User and Student tables
+            query = "INSERT INTO User " +
+                    "VALUES ( '" + newUser.getRegistrationNumber() + "', '" + newUser.getHash() + "', '" + newUser.getTitle() + "', '" + newUser.getSurname() +
+                    "', '" + newUser.getOtherNames() + "', '" + newUser.getRole() + "', '" + newUser.getEmail() + "')";
+            stmt2 = con.createStatement();
+            stmt2.executeUpdate(query);
+            query = "INSERT INTO Student " +
+                    "VALUES ('" + newUser.getRegistrationNumber() + "', '" + newUser.getDegreeId() + "', '" + newUser.getTutorName() + "', '" + newUser.getLevel() +" ')" ;
+            stmt2.executeUpdate(query);
+
+            // Enrol student on all compulsory modules
+            String moduleName;
+            while (modules.next()) {
+                moduleName = "'" + modules.getString(1) + "'";
+                query = "INSERT INTO Student_Module " +
+                        "VALUES ( '" + newUser.getRegistrationNumber() + "', '" + moduleName + "', '0')";
+                stmt2.execute(query);
+            }
+            return true;
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return false;
+        } finally {
+            // Close all open resources
+            try { if (users != null) users.close(); } catch (Exception e) {e.printStackTrace(System.err);}			try { if (modules != null) modules.close(); } catch (Exception e) {e.printStackTrace(System.err);}			try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}			try { if (stmt2 != null) stmt2.close(); } catch (Exception e) {e.printStackTrace(System.err);}		}
+    }
+
+    /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\GETTING OPERATIONS\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
     /**
      *
      * @param usernameInput The username of the user we want to return
@@ -364,9 +464,12 @@ public class SystemsOperations {
             if(con != null) con.close();
         }
 	}
-    //MISC
 
+    /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\ MISC \\\\\\\\\\\\\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
     /**
+    
 	 * 
 	 * @param currentUser The currently logged in user
 	 * @param newUser The user that is to be added
@@ -438,11 +541,33 @@ public class SystemsOperations {
 		}
     }
 
+
     private static int boolToInt(Boolean bool){
         if (bool){
             return 1;
         } else {
             return 0;
+        }
+    }
+
+    /**
+     * @param currentUser The currently logged in user
+     * @param userToUpdate The user that we want to update the grades for
+     * @param moduleId The module that we are updating the grade for
+     * @param resit Specifies whether it is a resit and therefore needs to be capped at 40% (0 if not resit, 1 if it is. Resit years are not capped afaik)
+     * @param grade The grade the user obtained
+     * @param con The currently open connection to the database
+     * @return Returns true if it is successful and false if it is not
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
+    public static boolean updateGrades (User currentUser, User userToUpdate, String moduleId, Boolean resit, int grade, Connection con) throws SQLException {
+        try {
+            //check user privilege
+            //Lazy operator so will only run the update grades if the privilege check passes
+            return currentUser.permissionCheck() >= 2 && userToUpdate.updateGrades(moduleId, resit, grade, con);
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+            return false;
         }
     }
 

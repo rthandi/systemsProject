@@ -49,7 +49,9 @@ public class User {
         email = emailInput;
 
     }
-    //GETTER METHODS
+    /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\GETTING METHODS\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
     public String getDegreeId() {
         return degreeId;
     }
@@ -92,8 +94,6 @@ public class User {
         return (title + " " + otherNames + " " + surname);
     }
 
-    //TODO: delete this at the end if not needed
-    //SETTER METHODS (MAY NOT NEED SO NOT ADDING YET)
 
     /**
      * @param con The current connection to the sql database
@@ -302,6 +302,12 @@ public class User {
         return level;
     }
 
+    /**
+     * @param moduleId The id of the module that is being added
+     * @param con The currently open connection to the database
+     * @return Returns true if the operation is successful, false if it isn't
+     * @throws SQLException Will throw and return false if there is an issue with the database
+     */
     public boolean addOptionalModule(String moduleId, Connection con) throws SQLException {
         //Check that the module is a valid optional module for the user
         ResultSet rs = null;
@@ -331,7 +337,7 @@ public class User {
                     stmt = con.createStatement();
                     query = "INSERT INTO Student_Module " +
                             "VALUES ('" + this.getRegistrationNumber() + "', '" + moduleId + "', '0')";
-                    stmt.executeQuery(query);
+                    stmt.executeUpdate(query);
                     return true;
                 }
             }
@@ -341,6 +347,82 @@ public class User {
             return false;
         } finally {
             try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
-            try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}}
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+        }
+    }
+
+    /**
+     * @param moduleId The id of the module that is being dropped
+     * @param con The currently open connection to the database
+     * @return Returns true if the operation is successful, false if it isn't
+     * @throws SQLException Will throw and return false if there is an issue with the database
+     */
+    public boolean dropOptionalModule(String moduleId, Connection con) throws SQLException {
+        ResultSet rs = null;
+        Statement stmt = null;
+        try {
+            stmt = con.createStatement();
+            //Need to check that the module is an optional module
+            String query = "SELECT Module_id " +
+                    "FROM Degree_Module_Approved " +
+                    "WHERE Degree_id = '" + this.getDegreeId() + "' AND Compulsory = '0' AND Module_id = '" + moduleId + "'";
+            rs = stmt.executeQuery(query);
+            if (rs.next()){
+                stmt.close();
+                stmt = con.createStatement();
+                query = "DELETE FROM Student_Module " +
+                        "WHERE Module_id = '" + moduleId + "' AND Username = '" + this.getRegistrationNumber() + "'";
+                stmt.executeUpdate(query);
+                return true;
+            }
+            return false;
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+            return false;
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+        }
+    }
+
+    /**
+     * @param moduleId The id of the module we are updating
+     * @param resit Specifies whether it is a resit and therefore needs to be capped at 40% (0 if not resit, 1 if it is. Resit years are not capped afaik)
+     * @param grade The grade the user obtained
+     * @param con The currently open connection to the database
+     * @return True if it is successful, false if it is not
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
+    public boolean updateGrades(String moduleId, Boolean resit, int grade, Connection con) throws SQLException {
+        ResultSet rs = null;
+        Statement stmt = null;
+        try {
+            //Check the user is taking the module
+            stmt = con.createStatement();
+            String query = "SELECT Module_id " +
+                    "FROM Student_Module " +
+                    "WHERE Module_id = '" + moduleId + "' AND Username = '" + this.getRegistrationNumber() + "'";
+            rs = stmt.executeQuery(query);
+            if (rs.next()){
+                //Check if it is a resit or not so we can cap at 40%
+                if (resit && grade > 40){
+                    grade = 40;
+                }
+                stmt.close();
+                stmt = con.createStatement();
+                query = "UPDATE Student_Module " +
+                        "SET Mark = '" + grade + "' " +
+                        "WHERE Module_id = '" + moduleId + "' AND Username = '" + this.getRegistrationNumber() + "'";
+                stmt.executeUpdate(query);
+                return true;
+            }
+            return false;
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+            return false;
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+        }
     }
 }
