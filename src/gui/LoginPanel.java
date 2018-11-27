@@ -2,6 +2,7 @@ package gui;
 
 import classes.*;
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,7 @@ public class LoginPanel extends JPanel{
 
     public LoginPanel(AppFrame appFrame) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBorder(BorderFactory.createTitledBorder("Login"));
         theFrame = appFrame;
         usernameField = new JTextField(10);
         passwordField = new JPasswordField(10);
@@ -28,16 +30,17 @@ public class LoginPanel extends JPanel{
                 if (command.equals("Submit")){
                     String username = usernameField.getText();
                     String password = passwordField.getText();
-                    //TODO check if the give username is in the database and if so the User is returned
                     User user = null;
                     try {
+                        System.out.println("hello?");
                         user = SystemsOperations.getUser(username, password);
+                        if(user.getRole().equals("Student")){
+                            theFrame.toStudentPanel(user);
+                        }else if(user.getRole().equals("Administrator")){
+                            theFrame.toAdminPanel(user);
+                        }
                     } catch (SQLException e1) {
                         e1.printStackTrace();
-                    }
-
-                    if(user.getRole().equals("Student")){
-                        theFrame.toStudentPanel(user);
                     }
                 }
             }

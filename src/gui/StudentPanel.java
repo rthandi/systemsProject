@@ -7,13 +7,22 @@ import java.awt.event.ActionListener;
 
 public class StudentPanel extends JPanel{
     public StudentPanel(User student){
-        System.out.println("hi");
+
         setLayout(new BorderLayout());
+        setBorder(BorderFactory.createLineBorder(Color.black));
 
         JPanel heading = new JPanel();
-            heading.setLayout(new GridLayout(1, 2));
-            heading.add(new JLabel(student.getFullName()));
-            heading.add(new JLabel(student.getDegreeId()));
+            heading.setLayout(new GridLayout(1,2));
+
+            JButton name = new JButton(student.getFullName());
+            JButton degree = new JButton(student.getDegreeId());
+
+            //name.setBorder(BorderFactory.createLineBorder(Color.black));
+            //degree.setBorder(BorderFactory.createLineBorder(Color.black));
+
+            heading.add(name);
+            heading.add(new JSeparator((SwingConstants.VERTICAL)));
+            heading.add(degree);
 
         add(heading, BorderLayout.NORTH);
 

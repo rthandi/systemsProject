@@ -3,11 +3,12 @@ import classes.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLException;
 
 
 public class AppFrame extends JFrame {
     public AppFrame() throws HeadlessException {
-        super("University of asd");
+        super("University of Things");
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
@@ -30,6 +31,15 @@ public class AppFrame extends JFrame {
         contentPane.removeAll();
 
         contentPane.add(new StudentPanel(student));
+
+        contentPane.revalidate();
+        contentPane.repaint();
+    }
+    public void toAdminPanel(User admin) throws SQLException {
+        Container contentPane = getContentPane();
+        contentPane.removeAll();
+
+        contentPane.add(new AdminPanel(this,admin));
 
         contentPane.revalidate();
         contentPane.repaint();
