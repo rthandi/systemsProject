@@ -28,19 +28,31 @@ public class AdminPanel extends JTabbedPane{
             deptList.addItem(d);
         }
         JButton deleteDeptButton = new JButton("Delete");
+        deleteDeptButton.setActionCommand("delete dept");
         //Deletes the selected Department
-        deleteDeptButton.addActionListener(new ActionListener(){
+        deleteDeptButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Department chosen = (Department) deptList.getSelectedItem();
-                Connection con = null;
-                try {
-                    con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
-                    SystemsOperations.deleteDepartment(user, chosen.getDepartmentCode(), con);
-                    deptList.remove(deptList.getSelectedIndex()); //ewwwwwww
-                    con.close();
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
+                String command = e.getActionCommand();
+                if(command.equals("delete dept")){
+                    Department chosen = (Department) deptList.getSelectedItem();
+                    Connection con = null;
+                    try {
+                        con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+                        SystemsOperations.deleteDepartment(user, chosen.getDepartmentCode(), con);
+                        deptList.remove(deptList.getSelectedIndex()); //ewwwwwww
+                        con.close();
+                    } catch (SQLException e1) {
+                        e1.printStackTrace();
+                    } finally {
+                        if (con != null) {
+                            try {
+                                con.close();
+                            } catch (SQLException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                    }
                 }
             }
         });
@@ -69,13 +81,22 @@ public class AdminPanel extends JTabbedPane{
             @Override
             public void actionPerformed(ActionEvent e){
                 Degree chosen = (Degree) degreeList.getSelectedItem();
+                Connection con = null;
                 try {
-                    Connection con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+                    con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
                     SystemsOperations.deleteDegree(user, chosen.getDegreeId(), con);
                     degreeList.remove(degreeList.getSelectedIndex());
                     con.close();
                 } catch (SQLException e1) {
                     e1.printStackTrace();
+                } finally {
+                    if(con != null){
+                        try {
+                            con.close();
+                        } catch (SQLException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
                 }
             }
         });
@@ -96,29 +117,89 @@ public class AdminPanel extends JTabbedPane{
         JTextField deptNameField = new JTextField(20);
         addDeptPanel.add(deptNameField);
 
-        JButton submitButton = new JButton("Submit");
-        submitButton.addActionListener(new ActionListener() {
+        JButton addDeptButton = new JButton("Submit");
+        addDeptButton.setActionCommand("add Dept");
+        addDeptButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String command = e.getActionCommand();
-                if (command.equals("Submit")){
+                if (command.equals("add Dept")){
+                    Connection con = null;
                     try {
-                        Connection con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+                        con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
                         String deptCode = deptCodeField.getText();
                         String deptName = deptNameField.getText();
 
                         SystemsOperations.addDepartment(user, deptCode, deptName, con);
 
-                        con.close();
+
                     } catch (SQLException e1) {
                         e1.printStackTrace();
+                    } finally {
+                        if(con != null){
+                            try {
+                                con.close();
+                            } catch (SQLException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
                     }
                 }
             }
         });
-        addDeptPanel.add(submitButton);
+        addDeptPanel.add(addDeptButton);
+
+    //Add Degree
+    JPanel addDegreePanel = new JPanel();
+        addDegreePanel.setLayout(new BoxLayout(addDegreePanel, BoxLayout.Y_AXIS));
+        addDegreePanel.setBorder(BorderFactory.createTitledBorder("New degree:"));
+
+        addDegreePanel.add(new JLabel("Degree ID:"));
+        JTextField degreeIdField = new JTextField(6);
+        addDegreePanel.add(degreeIdField);
+
+        addDegreePanel.add(new JLabel("Degree name:"));
+        JTextField degreeNameField = new JTextField(6);
+        addDegreePanel.add(degreeNameField);
+
+        addDegreePanel.add(new JLabel("Lead department"));
+        addDegreePanel.add(deptList);
+
+        JButton addDegButton = new JButton("Submit");
+        addDegButton.setActionCommand("add degree");
+        addDegButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String command = e.getActionCommand();
+                if (command.equals("add degree")){
+                    Connection con = null;
+                    try{
+                        con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+
+                        String degID = degreeIdField.getText();
+                        String degName = degreeNameField.getText();
+                        Department leadDept = (Department) deptList.getSelectedItem();
+                        String deptCode = leadDept.getDepartmentCode();
+
+                        SystemsOperations.addDegree(user, degID, degName, deptCode, con);
+                    } catch (SQLException e1) {
+                        e1.printStackTrace();
+                    } finally {
+                        try{con.close();
+                        } catch (SQLException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+
+
+
+
 
     add("Add Department", addDeptPanel);
+    add("Add Degree", addDegreePanel);
     addTab("Delete Department", deleteDeptPanel);
     add("Delete Degree", deleteDegreePanel);
     }

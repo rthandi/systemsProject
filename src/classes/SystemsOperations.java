@@ -237,6 +237,7 @@ public class SystemsOperations {
 	                query = "INSERT INTO Degree " +
 	                        "VALUES (" + degreeId + ", " + degreeName + ", " + departmentCode + ")";
 	                stmt.executeUpdate(query);
+	                stmt.close();
 	                return true;
 	            } else {
 	                return false;
