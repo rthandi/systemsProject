@@ -166,12 +166,12 @@ public class User {
     }
     
     /**
-     * 
+     * @param level The level you want to calculate the mean grade for
      * @param con The current connection to the database
-     * @return The total mean grade for the current period of study
+     * @return The total mean grade for the given period of study
      * @throws SQLException will throw if an SQL error is encountered
      */
-    public int calculateMeanGrade(Connection con) throws SQLException{
+    public int calculateMeanGrade(char level, Connection con) throws SQLException{
         Statement stmt = null;
         Statement stmt2 = null;
         Statement stmt3 = null;
@@ -183,7 +183,7 @@ public class User {
         try {
         	stmt = con.createStatement();
         	String query = "SELECT Module_id FROM Degree_Module_Approved " +
-        				   "WHERE Level = " + this.getLevel() + " AND Degree_id = " + this.getDegreeId();
+        				   "WHERE Level = " + level + " AND Degree_id = " + this.getDegreeId();
         	modules = stmt.executeQuery(query);
         	while (modules.next()) {
         		moduleArray.add(modules.getString("Module_id"));
@@ -220,6 +220,20 @@ public class User {
             try { if (stmt != null) stmt.close(); } catch (Exception e) {}
             try { if (stmt2 != null) stmt.close(); } catch (Exception e) {}
             try { if (stmt3 != null) stmt.close(); } catch (Exception e) {}
+        }
+    }
+
+    /**
+     * @param con The current connection to the database
+     * @return The mean grade for the current level of study
+     * @throws SQLException will throw if an SQL error is encountered
+     */
+    public int calculateMeanGradeCurrentLevel(Connection con) throws SQLException {
+        try {
+            return calculateMeanGrade(this.getLevel(), con);
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return (-1);
         }
     }
 
