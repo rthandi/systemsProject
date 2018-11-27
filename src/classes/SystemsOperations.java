@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class SystemsOperations {
-
+	
     /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     \\\\\\\\\\\\\\\DELETING OPERATIONS\\\\\\\\\\\\\\
     \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
@@ -27,6 +27,7 @@ public class SystemsOperations {
         } else {
             System.out.println("Permission level not high enough to perform this operation");
         }
+
     }
 
     /**
@@ -67,8 +68,8 @@ public class SystemsOperations {
         } catch (SQLException e) {
             e.printStackTrace(System.err);
         } finally {
-		try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}		}
-    	}
+			try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}		}
+    }
    	
     /**	
      * 	
@@ -175,13 +176,13 @@ public class SystemsOperations {
      * @throws SQLException Will print out the error with the database if one is encountered
      */
     public static void addDepartment (User currentUser, String departmentCode, String departmentName, Connection con) throws SQLException {
-		Statement stmt;
+	PreparedStatement stmt = null;
         try {
         	if (currentUser.permissionCheck() >= 4) {
-	            stmt = con.createStatement();
-	            String query = "INSERT INTO Department " +
-	                    "VALUES ('" + departmentCode + "', '" + departmentName + "')";
-	            stmt.executeUpdate(query);
+	            stmt = con.prepareStatement("INSERT INTO Department VALUES (?, ?)");
+	            stmt.setString(1, departmentCode);
+		    stmt.setString(2, departmentName);
+		    stmt.executeUpdate();
         	} else {
         		System.out.println("Permission level not high enough to perform this operation");
         	}
@@ -200,21 +201,20 @@ public class SystemsOperations {
      * @throws SQLException Throws and prints the error if there is an issue with the database
      */
     public static boolean addDegree (User currentUser, String degreeId, String degreeName, String departmentCode, Connection con) throws SQLException {
-		Statement stmt = null;
-		ResultSet rs = null;
+	PreparedStatement stmt = null;
+	ResultSet rs = null;
         try {
         	if (currentUser.permissionCheck() >= 4) {
-	            stmt = con.createStatement();
-	            String query = "SELECT  Department_Name " +
-	                    "FROM Department " +
-	                    "WHERE Department_Code = '" + departmentCode + "'";
-	            rs = stmt.executeQuery(query);
+	            stmt = con.prepareStatement("SELECT Department_Name FROM Deparment WHERE Deparment_Code = ?");
+		    stmt.setString(1, departmentCode);
+	            rs = stmt.executeQuery();
 	            //Check if the department that was inputted exists
 	            if (rs.next()) {
-	                query = "INSERT INTO Degree " +
-	                        "VALUES ('" + degreeId + "', '" + degreeName + "', '" + departmentCode + "')";
-	                stmt.executeUpdate(query);
-	                stmt.close();
+			stmt = con.prepareStatemnt("INSERT INTO Degree VALUES (?, ?, ?)");
+			stmt.setString(1, degreeId);
+			stmt.setString(2, degreeName);
+			stmt.setString(3, departmentCode);
+	                stmt.executeUpdate();
 	                return true;
 	            } else {
 	                return false;
@@ -244,24 +244,28 @@ public class SystemsOperations {
      * @throws SQLException Throws and prints the error if there is an issue with the database
      */
     public static boolean addModule  (User currentUser, String moduleId, String moduleName, int credits, char level, boolean compulsory, String degreeId, Connection con) throws SQLException {
-		Statement stmt = null;
-		ResultSet rs = null;
+	PreparedStatement stmt = null;
+	ResultSet rs = null;
         try {
         	if (currentUser.permissionCheck() >= 4) {
-	            stmt = con.createStatement();
-	            String query = "SELECT Degree_Name " +
-	                    "FROM Degree " +
-	                    "WHERE Degree_id = '" + degreeId + "'";
-	            rs = stmt.executeQuery(query);
+	            stmt = con.prepareStatement("SELECT Degree_Name FROM Degree WHERE Degree_id = ?");
+	            stmt.setString(1, degreeId);
+	            rs = stmt.executeQuery();
 	            //Check to see if the inputted department exists
 	            if (rs.next()) {
 	                //First insert into Modules
-	                query = "INSERT INTO Modules " +
-	                        "VALUES ( '" + moduleId + "', '" + moduleName + "', '" + credits + "')";
-	                stmt.executeUpdate(query);
-	                query = "INSERT INTO Degree_Module_Approved " +
-	                        "VALUES ( '" + degreeId + "', '" + level + "', '" + moduleId + "', '" + boolToInt(compulsory) + "')";
-	                stmt.executeUpdate(query);
+			stmt = con.prepareStatemnt("INSERT INTO Modules VALUES (?, ?, ?)");
+			stmt.setString(1, moduleId);
+			stmt.setString(2, moduleName);
+			stmt.setInt(3, credits);
+	                stmt.executeUpdate();
+			
+			stmt = con.prepareStatemnt("INSERT INTO Degree_Module_Approved VALUES (?, ?, ?, ?)");
+			stmt.setString(1, degreeId);
+			stmt.setChar(2, String.valueOf(level));
+			stmt.setString(3, moduleId);
+			stmt.setInt(4, boolToInt(compulsory));
+	                stmt.executeUpdate();
 	                return true;
 	            } else {
 	                return false;
@@ -328,10 +332,12 @@ public class SystemsOperations {
                 System.out.println("User already exists");
                 return false;
             }
+
             // Find all compulsory modules for student at their level and degree
             query = " SELECT Module_id FROM Degree_Module_Approved " +
                     " WHERE Compulsory = '1' AND Degree_id = '" + newUser.getDegreeId() + "' AND Level = '" + newUser.getLevel() + "'";
             modules = stmt.executeQuery(query);
+
             // Insert new Student into User and Student tables
             query = "INSERT INTO User " +
                     "VALUES ( '" + newUser.getRegistrationNumber() + "', '" + newUser.getHash() + "', '" + newUser.getTitle() + "', '" + newUser.getSurname() +
@@ -341,6 +347,7 @@ public class SystemsOperations {
             query = "INSERT INTO Student " +
                     "VALUES ('" + newUser.getRegistrationNumber() + "', '" + newUser.getDegreeId() + "', '" + newUser.getTutorName() + "', '" + newUser.getLevel() +" ')" ;
             stmt2.executeUpdate(query);
+
             // Enrol student on all compulsory modules
             String moduleName;
             while (modules.next()) {
@@ -478,7 +485,7 @@ public class SystemsOperations {
 				System.out.println("Permission level not high enough to create a user of this permission level");
 				return false;
 		}
-  
+    	
     	Statement stmt = null;
     	Statement stmt2 = null;
     	ResultSet users = null;
@@ -494,6 +501,7 @@ public class SystemsOperations {
 				System.out.println("User already exists");
 				return false;
 			}
+			
 			// Insert new User into User tables
             query = "INSERT INTO User " +
   		              "VALUES ( " + newUser.getRegistrationNumber() + ", " + newUser.getHash() + ", " + newUser.getTitle() + ", " + newUser.getSurname() +
@@ -507,7 +515,7 @@ public class SystemsOperations {
 	 			query = " SELECT Module_id FROM Degree_Module_Approved " +
 						" WHERE Compulsory = '1' AND Degree_id = " + newUser.getDegreeId() + " AND Level = " + newUser.getLevel();
 				modules = stmt.executeQuery(query);
-
+				
 				// Insert Student into student table
 	            query = "INSERT INTO Student " +
 	            		"VALUES (" + newUser.getRegistrationNumber() + ", " + newUser.getDegreeId() + ", " + newUser.getTutorName() + ", " + newUser.getLevel() +")" ;
@@ -536,7 +544,6 @@ public class SystemsOperations {
     }
 
 
-
     private static int boolToInt(Boolean bool){
         if (bool){
             return 1;
@@ -544,7 +551,6 @@ public class SystemsOperations {
             return 0;
         }
     }
-
 
     /**
      * @param currentUser The currently logged in user
