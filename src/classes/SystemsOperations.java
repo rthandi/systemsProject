@@ -60,7 +60,7 @@ public class SystemsOperations {
         	if (currentUser.permissionCheck() >= 4) {
 	            //Database is set up so that it will cascade and delete any data that relies on this
             	    stmt = con.prepareStatement("DELETE FROM Modules WHERE Module_id = ?");
-	            stmt.setString(1, departmentToDelete);
+	            stmt.setString(1, moduleId);
 	            stmt.executeUpdate();
     		} else {
         		System.out.println("Permission level not high enough to perform this operation");
@@ -84,7 +84,7 @@ public class SystemsOperations {
         	if (currentUser.permissionCheck() >= 3) {
 		    //Database is set up so that it will cascade and delete any data that relies on this
                     stmt = con.prepareStatement("DELETE FROM User WHERE Username = ?");
-	            stmt.setString(1, delUser.getRegistrationNumber);
+	            stmt.setString(1, delUser.getRegistrationNumber());
 	            stmt.executeUpdate();
     		} else {	
         		System.out.println("Permission level not high enough to perform this operation");	
