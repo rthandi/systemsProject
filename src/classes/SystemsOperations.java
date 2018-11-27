@@ -5,44 +5,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class SystemsOperations {
-    /**
-     * @param user The currently user that you want to check the total credits for
-     * @param con The current connection to the sql database
-     * @return true if they have the right amount of credits and false if they don't
-     * @throws SQLException If error with database then will print the error and return false
-     */
-    public static boolean checkTotalCredits(User user, Connection con) throws SQLException {
-		Statement stmt = null;
-		ResultSet rs = null;
-        try {
-            stmt = con.createStatement();
-//            TODO: Aparrently Credits cannot be found need to fix this at some point
-            String query = "SELECT Credits " +
-                    "FROM Student_Module " +
-                    "WHERE Username = '" + user.getRegistrationNumber() +
-                    "' INNER JOIN Modules " +
-                    " ON Student_Module.Module_id = Modules.Module_id";
-            //Insert sql query to get the modules that the user is doing
-            rs = stmt.executeQuery(query);
-            // Iterate over the ResultSet to total up the credits
-            int counter = 0;
-            while (rs.next()) {
-                counter += rs.getInt("Credits");
-            }
-            String level = user.getDegreeId().substring(3, 4);
-            //If U then it is undergrad
-            if (Objects.equals(level, "U")) {
-                return counter == 120;
-            } else {
-                return counter == 180;
-            }
-        } catch (SQLException e ) {
-            e.printStackTrace(System.err);
-            return false;
-        } finally {
-			try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
-			try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}		}
-    }
+
     /**
      * @param currentUser The user that is currently logged in
      * @param departmentToDelete The department code of the department that is to be deleted
@@ -285,7 +248,21 @@ public class SystemsOperations {
             e.printStackTrace(System.err);
             return false;
         } finally {
-			try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}			try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}		}
+			try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+			try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}}
+    }
+
+    public static boolean addModuleToUser(User currentUser, User userToAddTo, String moduleId, Connection con) throws SQLException {
+        //Check permissions of logged in user
+        if (currentUser.permissionCheck() >= 3){
+            try {
+                return userToAddTo.addOptionalModule(moduleId, con);
+            } catch (SQLException e){
+                e.printStackTrace(System.err);
+                return false;
+            }
+        }
+        return false;
     }
 
     //GETTING

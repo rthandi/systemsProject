@@ -5,8 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
-import static classes.SystemsOperations.checkTotalCredits;
+import java.util.Objects;
 
 public class User {
     // This is a class that will be used to represent the data of a user as an object once it has been fetched from the database
@@ -62,7 +61,7 @@ public class User {
     public String getOtherNames() {
         return otherNames;
     }
-    
+
     public String getRole() {
     	return role;
     }
@@ -70,7 +69,7 @@ public class User {
     public String getRegistrationNumber() {
         return registrationNumber;
     }
-    
+
     public String getHash() {
     	return hash;
     }
@@ -97,6 +96,69 @@ public class User {
     //SETTER METHODS (MAY NOT NEED SO NOT ADDING YET)
 
     /**
+     * @param con The current connection to the sql database
+     * @return true if they have the right amount of credits and false if they don't
+     * @throws SQLException If error with database then will print the error and return false
+     */
+    private int getTotalCredits(Connection con) throws SQLException {
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = con.createStatement();
+//            TODO: Apparently Credits cannot be found need to fix this at some point
+            String query = "SELECT Credits " +
+                    "FROM Student_Module " +
+                    "WHERE Username = '" + this.getRegistrationNumber() +
+                    "' INNER JOIN Modules " +
+                    " ON Student_Module.Module_id = Modules.Module_id";
+            //Insert sql query to get the modules that the user is doing
+            rs = stmt.executeQuery(query);
+            // Iterate over the ResultSet to total up the credits
+            int counter = 0;
+            while (rs.next()) {
+                counter += rs.getInt("Credits");
+            }
+            return counter;
+        } catch (SQLException e ) {
+            e.printStackTrace(System.err);
+            return -1;
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}		}
+    }
+
+
+    private boolean validateTotalCreditsCorrect(int numberOfCredits) {
+        String level = this.getDegreeId().substring(3, 4);
+        //If U then it is undergrad
+        if (Objects.equals(level, "U")) {
+            return numberOfCredits == 120;
+        } else {
+            return numberOfCredits == 180;
+        }
+    }
+
+    private boolean validateTotalCreditsUnder(int numberOfCredits){
+        String level = this.getDegreeId().substring(3, 4);
+        //If U then it is undergrad
+        if (Objects.equals(level, "U")) {
+            return numberOfCredits <= 120;
+        } else {
+            return numberOfCredits <= 180;
+        }
+    }
+
+    public boolean checkTotalCredits(Connection con) throws SQLException {
+        try{
+            return this.validateTotalCreditsCorrect(this.getTotalCredits(con));
+        } catch (SQLException e ) {
+            e.printStackTrace(System.err);
+            return false;
+        }
+    }
+
+
+    /**
      * @param con The current connection to the database
      * @return true if the user is registered correctly for their current year false if not
      * @throws SQLException Will throw and return false if there is an error with the database connection
@@ -107,7 +169,7 @@ public class User {
         ResultSet rsModulesApproved = null;
         try {
             //check if the total number of credits is correct
-            if (!checkTotalCredits(this, con)){
+            if (!checkTotalCredits(con)){
                 return false;
             }
             //Now we get the modules and check that they are all approved
@@ -238,5 +300,47 @@ public class User {
         else if (permission.equals("Administrator"))
             level = 4;
         return level;
+    }
+
+    public boolean addOptionalModule(String moduleId, Connection con) throws SQLException {
+        //Check that the module is a valid optional module for the user
+        ResultSet rs = null;
+        Statement stmt = null;
+        try {
+            int totalCredits = this.getTotalCredits(con);
+            //First we need to check the total number of credits to see if we can add another module
+            if (this.validateTotalCreditsUnder(totalCredits)){
+                System.out.println("Already at maximum credit count or over");
+                return false;
+            }
+            //Now we fetch the details of the module
+            stmt = con.createStatement();
+            String query = "SELECT Module_id, Credits " +
+                    "FROM Degree_Module_Approved " +
+                    //Checking for degree, optional, and level so we can confirm all of these are correct all in one go when we check if rs.next exists
+                    "WHERE Module_id = '" + moduleId + "' AND Degree_id = '" + this.getDegreeId() + "' AND Compulsory = '0' AND Level = '" + this.getLevel() + "'" +
+                    "INNER JOIN Modules " +
+                    "ON Degree_Module_Approved.Module_id = Modules.Module_id";
+            rs = stmt.executeQuery(query);
+            //Check that module exists
+            if (rs.next()){
+                //check that it wouldn't take the credit number over the limit
+                totalCredits += rs.getInt("Credits");
+                if(this.validateTotalCreditsUnder(totalCredits)){
+                    stmt.close();
+                    stmt = con.createStatement();
+                    query = "INSERT INTO Student_Module " +
+                            "VALUES ('" + this.getRegistrationNumber() + "', '" + moduleId + "', '0')";
+                    stmt.executeQuery(query);
+                    return true;
+                }
+            }
+            return false;
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+            return false;
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}}
     }
 }
