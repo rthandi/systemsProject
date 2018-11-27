@@ -233,7 +233,7 @@ public class User {
      * @return The total mean grade for the current period of study
      * @throws SQLException will throw if an SQL error is encountered
      */
-    public int calculateMeanGrade(Connection con) throws SQLException{
+    public int calculateMeanGrade(Connection con, char inpLevel) throws SQLException{
         Statement stmt = null;
         Statement stmt2 = null;
         Statement stmt3 = null;
@@ -245,7 +245,7 @@ public class User {
         try {
         	stmt = con.createStatement();
         	String query = "SELECT Module_id FROM Degree_Module_Approved " +
-        				   "WHERE Level = " + this.getLevel() + " AND Degree_id = " + this.getDegreeId();
+        				   "WHERE Level = " + inpLevel + " AND Degree_id = " + this.getDegreeId();
         	modules = stmt.executeQuery(query);
         	while (modules.next()) {
         		moduleArray.add(modules.getString("Module_id"));
@@ -257,17 +257,13 @@ public class User {
         	studentModules = stmt2.executeQuery(query);
         	
         	while (studentModules.next()) {
-        		System.out.println(studentModules.getString("Module_id"));
         		if (moduleArray.contains(studentModules.getString("Module_id"))) {
         			stmt3 = con.createStatement();
         			query = "SELECT Credits FROM Modules " +
         					"WHERE Module_id = '" + studentModules.getString("Module_id") + "'";
         			credits = stmt3.executeQuery(query);
         			while (credits.next()) {
-        				//System.out.println(credits.getInt("Credits"));
         				total += (studentModules.getInt("Mark") * (credits.getFloat("Credits")/120));
-        				System.out.println(total);
-        		//		return total;
         			}
         		}
         	}
