@@ -279,7 +279,7 @@ public class User {
                     stmt = con.createStatement();
                     query = "INSERT INTO Student_Module " +
                             "VALUES ('" + this.getRegistrationNumber() + "', '" + moduleId + "', '0')";
-                    stmt.executeQuery(query);
+                    stmt.executeUpdate(query);
                     return true;
                 }
             }
@@ -313,7 +313,7 @@ public class User {
                 stmt = con.createStatement();
                 query = "DELETE FROM Student_Module " +
                         "WHERE Module_id = '" + moduleId + "' AND Username = '" + this.getRegistrationNumber() + "'";
-                stmt.executeQuery(query);
+                stmt.executeUpdate(query);
                 return true;
             }
             return false;
