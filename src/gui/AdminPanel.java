@@ -13,7 +13,6 @@ import java.util.ArrayList;
 public class AdminPanel extends JTabbedPane{
     public AdminPanel(AppFrame appFrame, User user) throws SQLException {
 
-
     //DELETE DEPARTMENT PANEL
     JPanel deleteDeptPanel = new JPanel();
         ArrayList<Department> depts = null;
@@ -56,8 +55,6 @@ public class AdminPanel extends JTabbedPane{
                 }
             }
         });
-
-
         deleteDeptPanel.add(deptList);
         deleteDeptPanel.add(deleteDeptButton);
 
@@ -70,11 +67,9 @@ public class AdminPanel extends JTabbedPane{
             e.printStackTrace();
         }
         JComboBox degreeList = new JComboBox();
-
         for(Degree d:degrees) {
             degreeList.addItem(d);
         }
-
         JButton deleteDegButton = new JButton("Delete");
         //Deletes the selected Degree
         deleteDegButton.addActionListener(new ActionListener() {
@@ -100,8 +95,6 @@ public class AdminPanel extends JTabbedPane{
                 }
             }
         });
-
-
         deleteDegreePanel.add(degreeList);
         deleteDegreePanel.add(deleteDegButton);
 
@@ -129,10 +122,7 @@ public class AdminPanel extends JTabbedPane{
                         con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
                         String deptCode = deptCodeField.getText();
                         String deptName = deptNameField.getText();
-
                         SystemsOperations.addDepartment(user, deptCode, deptName, con);
-
-
                     } catch (SQLException e1) {
                         e1.printStackTrace();
                     } finally {
@@ -193,11 +183,6 @@ public class AdminPanel extends JTabbedPane{
                 }
             }
         });
-
-
-
-
-
     add("Add Department", addDeptPanel);
     add("Add Degree", addDegreePanel);
     addTab("Delete Department", deleteDeptPanel);
