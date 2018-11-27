@@ -16,7 +16,7 @@ public class LoginPanel extends JPanel{
 
     public LoginPanel(AppFrame appFrame) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(BorderFactory.createTitledBorder("Login"));
+        setBorder(BorderFactory.createTitledBorder("Login")); //Love this
         theFrame = appFrame;
         usernameField = new JTextField(10);
         passwordField = new JPasswordField(10);
@@ -32,7 +32,6 @@ public class LoginPanel extends JPanel{
                     String password = passwordField.getText();
                     User user = null;
                     try {
-                        System.out.println("hello?");
                         user = SystemsOperations.getUser(username, password);
                         if(user.getRole().equals("Student")){
                             theFrame.toStudentPanel(user);
