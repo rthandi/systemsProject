@@ -6,7 +6,6 @@ import java.util.Objects;
 
 public class SystemsOperations {
 
-
     /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     \\\\\\\\\\\\\\\DELETING OPERATIONS\\\\\\\\\\\\\\
     \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
@@ -27,7 +26,6 @@ public class SystemsOperations {
         } else {
             System.out.println("Permission level not high enough to perform this operation");
         }
-
     }
 
     /**
@@ -70,8 +68,8 @@ public class SystemsOperations {
         } catch (SQLException e) {
             e.printStackTrace(System.err);
         } finally {
-			try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}		}
-    }
+		try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}		}
+    	}
    	
     /**	
      * 	
@@ -106,7 +104,6 @@ public class SystemsOperations {
      */	
     public static void deleteStudentModule (User currentUser, User userToRemove, String moduleId, Connection con) throws SQLException {	
         try {	
-	
         	if (currentUser.permissionCheck() >= 3) {	
 	            Statement stmt = con.createStatement();	
 	            //Database is set up so that it will cascade and delete any data that relies on this
@@ -183,9 +180,7 @@ public class SystemsOperations {
         	if (currentUser.permissionCheck() >= 4) {
 	            stmt = con.createStatement();
 	            String query = "INSERT INTO Department " +
-
 	                    "VALUES ('" + departmentCode + "', '" + departmentName + "')";
-
 	            stmt.executeUpdate(query);
         	} else {
         		System.out.println("Permission level not high enough to perform this operation");
@@ -333,12 +328,10 @@ public class SystemsOperations {
                 System.out.println("User already exists");
                 return false;
             }
-
             // Find all compulsory modules for student at their level and degree
             query = " SELECT Module_id FROM Degree_Module_Approved " +
                     " WHERE Compulsory = '1' AND Degree_id = '" + newUser.getDegreeId() + "' AND Level = '" + newUser.getLevel() + "'";
             modules = stmt.executeQuery(query);
-
             // Insert new Student into User and Student tables
             query = "INSERT INTO User " +
                     "VALUES ( '" + newUser.getRegistrationNumber() + "', '" + newUser.getHash() + "', '" + newUser.getTitle() + "', '" + newUser.getSurname() +
@@ -348,7 +341,6 @@ public class SystemsOperations {
             query = "INSERT INTO Student " +
                     "VALUES ('" + newUser.getRegistrationNumber() + "', '" + newUser.getDegreeId() + "', '" + newUser.getTutorName() + "', '" + newUser.getLevel() +" ')" ;
             stmt2.executeUpdate(query);
-
             // Enrol student on all compulsory modules
             String moduleName;
             while (modules.next()) {
@@ -486,7 +478,7 @@ public class SystemsOperations {
 				System.out.println("Permission level not high enough to create a user of this permission level");
 				return false;
 		}
-    	
+  
     	Statement stmt = null;
     	Statement stmt2 = null;
     	ResultSet users = null;
@@ -502,7 +494,6 @@ public class SystemsOperations {
 				System.out.println("User already exists");
 				return false;
 			}
-			
 			// Insert new User into User tables
             query = "INSERT INTO User " +
   		              "VALUES ( " + newUser.getRegistrationNumber() + ", " + newUser.getHash() + ", " + newUser.getTitle() + ", " + newUser.getSurname() +
@@ -516,7 +507,7 @@ public class SystemsOperations {
 	 			query = " SELECT Module_id FROM Degree_Module_Approved " +
 						" WHERE Compulsory = '1' AND Degree_id = " + newUser.getDegreeId() + " AND Level = " + newUser.getLevel();
 				modules = stmt.executeQuery(query);
-				
+
 				// Insert Student into student table
 	            query = "INSERT INTO Student " +
 	            		"VALUES (" + newUser.getRegistrationNumber() + ", " + newUser.getDegreeId() + ", " + newUser.getTutorName() + ", " + newUser.getLevel() +")" ;
