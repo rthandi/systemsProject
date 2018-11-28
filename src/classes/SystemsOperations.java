@@ -1,5 +1,6 @@
 package classes;
 
+import javax.jws.soap.SOAPBinding;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -282,6 +283,37 @@ public class SystemsOperations {
 			try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}}
     }
 
+    public static boolean addModuleToDegree (User currentUser, String degreeId, char level, String moduleId, boolean compulsory, Connection con) throws SQLException{
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            if (currentUser.permissionCheck() >= 4) {
+                stmt = con.createStatement();
+                String query = "SELECT Degree_Name " +
+                        "FROM Degree " +
+                        "WHERE Degree_id = '" + degreeId + "'";
+                rs = stmt.executeQuery(query);
+                //Check to see if the inputted department exists
+                if (rs.next()) {
+                    stmt.executeUpdate(query);
+                    query = "INSERT INTO Degree_Module_Approved " +
+                            "VALUES ( '" + degreeId + "', '" + level + "', '" + moduleId + "', '" + boolToInt(compulsory) + "')";
+                    stmt.executeUpdate(query);
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                System.out.println("Permission level not high enough to perform this operation");
+                return false;
+            }
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return false;
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}}
+        }
     /**
      * @param currentUser The currently logged in user
      * @param userToAddTo The user we want to add the module to
@@ -386,20 +418,20 @@ public class SystemsOperations {
                 String query = "SELECT * FROM User " +
                         "WHERE Username = '" + usernameInput +
                         "' AND Hash = '" + hashInput +"'";
-                //String query = "SELECT * FROM User WHERE Username = 'aca17ab' AND Hash = 'hashsash'";
 
                 rs = stmt.executeQuery(query);
-                rs.first();
-
-                String username = rs.getString("Username");
-                String hash = rs.getString("Hash");
-                String title = rs.getString("Title");
-                String surname = rs.getString("Surname");
-                String otherNames = rs.getString("Other_names");
-                String role = rs.getString("Role");
-                String email = rs.getString("Email");
-                con.close();
-                return new User(username, hash, title, surname, otherNames, role, email);
+                if(rs.next()) {
+                    String username = rs.getString("Username");
+                    String hash = rs.getString("Hash");
+                    String title = rs.getString("Title");
+                    String surname = rs.getString("Surname");
+                    String otherNames = rs.getString("Other_names");
+                    String role = rs.getString("Role");
+                    String email = rs.getString("Email");
+                    return new User(username, hash, title, surname, otherNames, role, email);
+                }else{
+                    return null;
+                }
             } catch (SQLException e) {
                 e.printStackTrace(System.err);
                 return null;
