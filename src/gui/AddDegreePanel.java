@@ -38,7 +38,7 @@ public class AddDegreePanel extends JPanel {
 
         JButton submitButton = new JButton("Submit");
         submitButton.setActionCommand("add degree");
-        submitButton.addActionListener(new ActionListener()) {
+        submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String command = e.getActionCommand();
