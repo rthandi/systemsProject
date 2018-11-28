@@ -93,6 +93,45 @@ public class User {
     public String getFullName(){
         return (title + " " + otherNames + " " + surname);
     }
+    
+    /**
+     * Method to increase the level of a student
+     * @return increased student level
+     */
+    public char increaseLevel() {
+    	if (degreeId.substring(4, 6).equals("U1")) {
+    		if (level == '2') {
+    			level = 'P';
+    			return level;
+    		}
+    		else if (level == 'P') {
+    			level = '3';
+    			return level;
+    		}
+    		else {
+    			level = (char)((int)level + 1);
+    			return level;
+    		}
+    	}
+    	else if (degreeId.substring(4, 6).equals("P1")) {
+    		if (level == '3') {
+    			level = 'P';
+    			return level;
+    		}
+    		else if (level == 'P') {
+    			level = '4';
+    			return level;
+    		}
+    		else {
+    			level = (char)((int)level + 1);
+    			return level;
+    		}
+    	}
+    	else {
+			level = (char)((int)level + 1);
+			return level;
+		}
+    }
 
 
     /**
@@ -241,7 +280,7 @@ public class User {
         ResultSet studentModules = null;
         ResultSet credits = null;
         ArrayList<String> moduleArray = new ArrayList<>();
-        int total = 0;
+        int total = 0;	
         try {
         	stmt = con.createStatement();
         	String query = "SELECT Module_id FROM Degree_Module_Approved " +
@@ -280,7 +319,7 @@ public class User {
             try { if (stmt3 != null) stmt.close(); } catch (Exception e) {}
         }
     }
-
+    
     /**
      * @return An int value of the permissions of the User
      */

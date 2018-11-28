@@ -574,6 +574,107 @@ public class SystemsOperations {
 			try { if (stmt2 != null) stmt2.close(); } catch (Exception e) {}
 		}
     }
+	
+	/**
+	 * 
+	 * @param current 
+	 * @param student
+	 * @param con
+	 * @return
+	 */
+	public static boolean giveCompModules(User current, User student, Connection con) {
+		if (student.permissionCheck() == 1 && current.permissionCheck() >= 2) {
+			Statement stmt = null;
+			Statement stmt2 = null;
+			ResultSet modules  = null; 
+			String moduleName = null;
+			try {
+				stmt = con.createStatement();
+				String query = "SELECT Module_id FROM Degree_Module_Approved " +
+						"WHERE Compulsory = '1' AND Degree_id = " + student.getDegreeId() + " AND Level = " + student.getLevel();
+				modules = stmt.executeQuery(query);
+				
+				stmt2 = con.createStatement();
+				while (modules.next()) {
+					moduleName = "'" + modules.getString(1) + "'";
+	            	query = "INSERT INTO Student_Module " +
+	            			"VALUES ( " + student.getRegistrationNumber() + ", " + moduleName + ", '0')";
+	            	stmt2.execute(query);
+					
+				}
+				return true;
+				
+			} catch (SQLException e){
+		        e.printStackTrace(System.err);
+		        return false;
+		    } finally {
+		        try { if (modules != null) modules.close(); } catch (Exception e) {}
+		        try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+		        try { if (stmt2 != null) stmt2.close(); } catch (Exception e) {}
+		    }
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param currentUser
+	 * @param student
+	 * @param con
+	 * @return
+	 * @throws SQLException
+	 */
+	public static boolean canProgressStudent (User currentUser, User student, Connection con) throws SQLException {
+		if ((currentUser.permissionCheck() >= 2) && (student.permissionCheck() <= 1)) {
+			System.out.println(student.calculateMeanGrade(con, student.getLevel()));
+			if ((student.getLevel() <= '3') && (student.calculateMeanGrade(con, student.getLevel()) >= 40)) {
+				//allowed to continue = true
+				return true;
+			}
+			if ((student.getLevel() == '4') && (student.calculateMeanGrade(con, student.getLevel()) >= 50)) {
+				//allowed to continue = true
+				return true;
+			}
+			if (student.getLevel() == 'P') {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @param currentUser
+	 * @param student
+	 * @param con
+	 * @return
+	 * @throws SQLException
+	 */
+	public static boolean progressStudents(User currentUser, User student, Connection con) throws SQLException {
+		Statement stmt = null;
+		try {
+			stmt = con.createStatement();
+			
+			if (canProgressStudent(currentUser, student, con)) {
+				student.increaseLevel();
+				// change students level in database
+				String query = "UPDATE Student SET " +
+						" Level = '" + student.getLevel() + "'" +
+						" WHERE Username = " + student.getRegistrationNumber();
+				stmt.executeUpdate(query);
+				// give the student new compulsory modules
+				giveCompModules(currentUser, student, con);
+			}
+		} catch (SQLException e){
+	        e.printStackTrace(System.err);
+	        return false;
+	    } finally {
+	        try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+	    }
+		return false;
+		
+	}
 
 
     private static int boolToInt(Boolean bool){
