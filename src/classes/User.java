@@ -136,6 +136,7 @@ public class User {
 
 
     /**
+     * Checks if a student has the correct number of credits for their studies
      * @param con The current connection to the sql database
      * @return true if they have the right amount of credits and false if they don't
      * @throws SQLException If error with database then will print the error and return false
@@ -168,6 +169,11 @@ public class User {
     }
 
 
+    /**
+     * Validate the number of credits a student has
+     * @param numberOfCredits The number of Credits a student has
+     * @return True if valid, False if not
+     */
     private boolean validateTotalCreditsCorrect(int numberOfCredits) {
         char level = this.getLevel();
         //If 1, 2, or 3 then it is 120 credits
@@ -178,6 +184,11 @@ public class User {
         }
     }
 
+    /**
+     * Validate the number of credits an Undergraduate student has
+     * @param numberOfCredits The number of Credits a student has
+     * @return True if valid, False if not
+     */
     private boolean validateTotalCreditsUnder(int numberOfCredits){
         char level = this.getLevel();
         //If 1, 2, or 3 then it is 120 credits
@@ -199,8 +210,9 @@ public class User {
 
 
     /**
+     * Check to see if a Student is registered for their degree and current year correctly
      * @param con The current connection to the database
-     * @return true if the user is registered correctly for their current year false if not
+     * @return True if the user is registered correctly for their current year, False if not
      * @throws SQLException Will throw and return false if there is an error with the database connection
      */
     public boolean checkRegValid(Connection con) throws SQLException {
@@ -268,7 +280,7 @@ public class User {
     }
     
     /**
-     * 
+     * Calculates the weighted mean grade a student has obtained in a given level of study
      * @param con The current connection to the database
      * @return The total mean grade for the current period of study
      * @throws SQLException will throw if an SQL error is encountered
@@ -322,6 +334,7 @@ public class User {
     }
     
     /**
+     * Checks the role of a user and gives them a permission level based on that
      * @return An int value of the permissions of the User
      */
     public int permissionCheck() {
@@ -339,6 +352,7 @@ public class User {
     }
 
     /**
+     * Gives a student an optional module
      * @param moduleId The id of the module that is being added
      * @param con The currently open connection to the database
      * @return Returns true if the operation is successful, false if it isn't
@@ -388,6 +402,7 @@ public class User {
     }
 
     /**
+     * Removes an optional module from a student
      * @param moduleId The id of the module that is being dropped
      * @param con The currently open connection to the database
      * @return Returns true if the operation is successful, false if it isn't
@@ -422,6 +437,7 @@ public class User {
     }
 
     /**
+     * Change the grade a Student has obtained for a given module
      * @param moduleId The id of the module we are updating
      * @param resit Specifies whether it is a resit and therefore needs to be capped at 40% (0 if not resit, 1 if it is. Resit years are not capped afaik)
      * @param grade The grade the user obtained
@@ -462,6 +478,12 @@ public class User {
         }
     }
 
+    /**
+     * Calculate what class degree a student has obtained through their studies
+     * @param con The currently open connection to the database
+     * @return The level that the student graduates with
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
     public String graduate(Connection con) throws SQLException {
         ResultSet rs = null;
         Statement stmt = null;
