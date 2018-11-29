@@ -1,5 +1,6 @@
 package classes;
 
+import javax.print.DocFlavor;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -93,9 +94,57 @@ public class User {
     public String getFullName(){
         return (title + " " + otherNames + " " + surname);
     }
+    
+    // Setter method
+    public String setRole(String newRole) {
+    	role = newRole;
+    	return role;
+    }
+    
+    
+    // Other
+    /**
+     * Method to increase the level of a student
+     * @return increased student level
+     */
+    public char increaseLevel() {
+    	if (degreeId.substring(4, 6).equals("U1")) {
+    		if (level == '2') {
+    			level = 'P';
+    			return level;
+    		}
+    		else if (level == 'P') {
+    			level = '3';
+    			return level;
+    		}
+    		else {
+    			level = (char)((int)level + 1);
+    			return level;
+    		}
+    	}
+    	else if (degreeId.substring(4, 6).equals("P1")) {
+    		if (level == '3') {
+    			level = 'P';
+    			return level;
+    		}
+    		else if (level == 'P') {
+    			level = '4';
+    			return level;
+    		}
+    		else {
+    			level = (char)((int)level + 1);
+    			return level;
+    		}
+    	}
+    	else {
+			level = (char)((int)level + 1);
+			return level;
+		}
+    }
 
 
     /**
+     * Checks if a student has the correct number of credits for their studies
      * @param con The current connection to the sql database
      * @return true if they have the right amount of credits and false if they don't
      * @throws SQLException If error with database then will print the error and return false
@@ -128,20 +177,30 @@ public class User {
     }
 
 
+    /**
+     * Validate the number of credits a student has
+     * @param numberOfCredits The number of Credits a student has
+     * @return True if valid, False if not
+     */
     private boolean validateTotalCreditsCorrect(int numberOfCredits) {
-        String level = this.getDegreeId().substring(3, 4);
-        //If U then it is undergrad
-        if (Objects.equals(level, "U")) {
+        char level = this.getLevel();
+        //If 1, 2, or 3 then it is 120 credits
+        if (level == 1 || level == 2 || level ==  3) {
             return numberOfCredits == 120;
         } else {
             return numberOfCredits == 180;
         }
     }
 
+    /**
+     * Validate the number of credits an Undergraduate student has
+     * @param numberOfCredits The number of Credits a student has
+     * @return True if valid, False if not
+     */
     private boolean validateTotalCreditsUnder(int numberOfCredits){
-        String level = this.getDegreeId().substring(3, 4);
-        //If U then it is undergrad
-        if (Objects.equals(level, "U")) {
+        char level = this.getLevel();
+        //If 1, 2, or 3 then it is 120 credits
+        if (level == 1 || level == 2 || level ==  3) {
             return numberOfCredits <= 120;
         } else {
             return numberOfCredits <= 180;
@@ -159,8 +218,9 @@ public class User {
 
 
     /**
+     * Check to see if a Student is registered for their degree and current year correctly
      * @param con The current connection to the database
-     * @return true if the user is registered correctly for their current year false if not
+     * @return True if the user is registered correctly for their current year, False if not
      * @throws SQLException Will throw and return false if there is an error with the database connection
      */
     public boolean checkRegValid(Connection con) throws SQLException {
@@ -228,7 +288,7 @@ public class User {
     }
     
     /**
-     * 
+     * Calculates the weighted mean grade a student has obtained in a given level of study
      * @param con The current connection to the database
      * @return The total mean grade for the current period of study
      * @throws SQLException will throw if an SQL error is encountered
@@ -241,7 +301,7 @@ public class User {
         ResultSet studentModules = null;
         ResultSet credits = null;
         ArrayList<String> moduleArray = new ArrayList<>();
-        int total = 0;
+        int total = 0;	
         try {
         	stmt = con.createStatement();
         	String query = "SELECT Module_id FROM Degree_Module_Approved " +
@@ -280,8 +340,9 @@ public class User {
             try { if (stmt3 != null) stmt.close(); } catch (Exception e) {}
         }
     }
-
+    
     /**
+     * Checks the role of a user and gives them a permission level based on that
      * @return An int value of the permissions of the User
      */
     public int permissionCheck() {
@@ -299,6 +360,7 @@ public class User {
     }
 
     /**
+     * Gives a student an optional module
      * @param moduleId The id of the module that is being added
      * @param con The currently open connection to the database
      * @return Returns true if the operation is successful, false if it isn't
@@ -348,6 +410,7 @@ public class User {
     }
 
     /**
+     * Removes an optional module from a student
      * @param moduleId The id of the module that is being dropped
      * @param con The currently open connection to the database
      * @return Returns true if the operation is successful, false if it isn't
@@ -382,6 +445,7 @@ public class User {
     }
 
     /**
+     * Change the grade a Student has obtained for a given module
      * @param moduleId The id of the module we are updating
      * @param resit Specifies whether it is a resit and therefore needs to be capped at 40% (0 if not resit, 1 if it is. Resit years are not capped afaik)
      * @param grade The grade the user obtained
@@ -419,6 +483,146 @@ public class User {
         } finally {
             try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
             try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+        }
+    }
+
+    /**
+     * Calculate what class degree a student has obtained through their studies
+     * @param con The currently open connection to the database
+     * @return The level that the student graduates with
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
+    public String graduate(Connection con) throws SQLException {
+        ResultSet rs = null;
+        Statement stmt = null;
+        try {
+            String output;
+            char level = this.getLevel();
+            //Check if one year MSc
+            if (Objects.equals(this.getDegreeId().substring(3, 4), "P")) {
+                //Check if dissertation was passed
+                stmt = con.createStatement();
+                String query = "SELECT Student_Module.Mark, Credits " +
+                        "FROM Student_Module " +
+                        "INNER JOIN Modules " +
+                        "ON Student_Module.Module_id = Modules.Module_id " +
+                        "WHERE Student_Module.Username = '" + this.getRegistrationNumber() + "'";
+                rs = stmt.executeQuery(query);
+                boolean passedDissertation = true;
+                ArrayList<Grade> gradeList = new ArrayList<>();
+                while (rs.next()){
+                    if (rs.getInt("Credits") == 60){
+                        if(rs.getInt("Mark") <= 49.5){
+                            passedDissertation = false;
+                        } else {
+                            gradeList.add(new Grade(rs.getInt("Mark"), rs.getInt("Credits")));
+                        }
+                    }
+                }
+                if (!passedDissertation){
+                    //dissertation failed. Check to see if they qualify for a PGDip
+                    int amountOfCreditsPassed = 0;
+                    boolean concededUsed = false;
+                    for (Grade aGradeList : gradeList) {
+                        if (aGradeList.getGrade() >= 49.5) {
+                            //Module passed add credits to total
+                            amountOfCreditsPassed += aGradeList.getCredits();
+                        } else if (!concededUsed && aGradeList.getGrade()>= 39.5){
+                            amountOfCreditsPassed += aGradeList.getCredits();
+                            concededUsed = true;
+                        }
+                    }
+                    if (amountOfCreditsPassed == 120){
+                        output = "Failed dissertation, PGDip awarded";
+                    } else {
+                        output = "fail";
+                    }
+                } else {
+                    int total = this.calculateMeanGrade(con, 'P');
+                    //Calculate degree class
+                    if (total >= 69.5) {
+                        output = "Distinction";
+                    } else if (total >= 59.5) {
+                        output = "Merit";
+                    } else if (total >= 49.5) {
+                        output = "Pass";
+                    } else {
+                        //Failed, check for PGCert
+                        int amountOfCreditsPassed = 0;
+                        for (Grade aGradeList : gradeList) {
+                            if (aGradeList.getGrade() >= 49.5) {
+                                //Module passed add credits to total
+                                amountOfCreditsPassed += aGradeList.getCredits();
+                            }
+                        }
+                        if (amountOfCreditsPassed >= 60) {
+                            output = "Qualified for PGCert";
+                        } else {
+                            output = "Failed";
+                        }
+                    }
+                }
+            } else {
+                int secondYearMark = this.calculateMeanGrade(con, '2');
+                int thirdYearMark = this.calculateMeanGrade(con, '3');
+                //Check current level to see if masters or undergraduate (may be better way of doing this lemme know)
+                if (level == '3') {
+                    //calculate weighted total grade
+                    int total = ((secondYearMark + (thirdYearMark * 2)) / 3);
+                    //Calculate degree class
+                    if (total >= 69.5) {
+                        output = "First class";
+                    } else if (total >= 59.5) {
+                        output = "Upper second";
+                    } else if (total >= 49.5) {
+                        output = "Lower second";
+                    } else if (total >= 44.5) {
+                        output = "Third class";
+                    } else if (total >= 39.5) {
+                        output = "Pass (non-honours)";
+                    } else {
+                        output = "fail";
+                    }
+                } else if (level == '4') {
+                    int fourthYearMark = this.calculateMeanGrade(con, '4');
+                    int total = ((secondYearMark + (thirdYearMark * 2) + (fourthYearMark * 2)) / 5);
+                    //Calculate degree class
+                    if (total >= 69.5) {
+                        output = "First class";
+                    } else if (total >= 59.5) {
+                        output = "Upper second";
+                    } else if (total >= 49.5) {
+                        output = "Lower second";
+                    } else {
+                        //They graduate with a bachelor's
+                        //calculate weighted total grade
+                        total = ((secondYearMark + (thirdYearMark * 2)) / 3);
+                        //Calculate degree class
+                        if (total >= 69.5) {
+                            output = "Failed fourth level: graduate with bachelor's first class";
+                        } else if (total >= 59.5) {
+                            output = "Failed fourth level: graduate with bachelor's upper second";
+                        } else if (total >= 49.5) {
+                            output = "Failed fourth level: graduate with bachelor's lower second";
+                        } else if (total >= 44.5) {
+                            output = "Failed fourth level: graduate with bachelor's third class";
+                        } else if (total >= 39.5) {
+                            output = "Failed fourth level: graduate with bachelor's pass (non-honours)";
+                        } else {
+                            output = "fail";
+                        }
+                    }
+                } else {
+                    output = "Not yet ready for graduation";
+                }
+            }
+            return output;
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+            return "Error encountered";
+        } finally {
+        try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+        try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
         }
     }
 }

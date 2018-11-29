@@ -29,15 +29,18 @@ public class LoginPanel extends JPanel{
                 String command = e.getActionCommand();
                 if (command.equals("Submit")){
                     String username = usernameField.getText();
-                    String password = passwordField.getText();
-                    User user = null;
+                    String password = Sha.getSHA(passwordField.getText());
                     try {
-                        System.out.println("hello?");
-                        user = SystemsOperations.getUser(username, password);
+                        User user = SystemsOperations.getUser(username, password);
                         if(user.getRole().equals("Student")){
                             theFrame.toStudentPanel(user);
                         }else if(user.getRole().equals("Administrator")){
                             theFrame.toAdminPanel(user);
+                        }else if(user.getRole().equals("Registrar")){
+                        	theFrame.toRegistrarPanel(user);
+                        }else if (user.getRole().equals("Teacher")){
+                        	theFrame.toTeacherPanel(user);
+                        }else {
                         }
                     } catch (SQLException e1) {
                         e1.printStackTrace();

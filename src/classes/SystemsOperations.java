@@ -1,8 +1,7 @@
 package classes;
-
+import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class SystemsOperations {
 	
@@ -11,9 +10,10 @@ public class SystemsOperations {
     \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
 	
     /**
+     * Method to remove a Department from the University database
      * @param currentUser The user that is currently logged in
      * @param departmentToDelete The department code of the department that is to be deleted
-     * @param con Current connection to the database
+     * @param con The currently open connection to the database
      * @throws SQLException Will print out the error with the database if one is encountered
      */
     public static void deleteDepartment (User currentUser, String departmentToDelete, Connection con) throws SQLException {
@@ -22,8 +22,8 @@ public class SystemsOperations {
         if (currentUser.permissionCheck() >= 4) {
             //Database is set up so that it will cascade and delete any data that relies on this
             stmt = con.prepareStatement("DELETE FROM Department WHERE Deparment_Code = ?");
-	    stmt.setString(1, departmentToDelete);
-	    stmt.executeUpdate();
+            stmt.setString(1, departmentToDelete);
+            stmt.executeUpdate();
         } else {
             System.out.println("Permission level not high enough to perform this operation");
         }
@@ -31,6 +31,7 @@ public class SystemsOperations {
     }
 
     /**
+     * Method to remove a Degree from the University database
      * @param currentUser The currently logged in user
      * @param degreeIdToDelete the ID of the degree that is to be deleted
      * @param con The open connection to the database
@@ -41,14 +42,15 @@ public class SystemsOperations {
         if (currentUser.permissionCheck() >= 4) {
             //Database is set up so that it will cascade and delete any data that relies on this
             stmt = con.prepareStatement("DELETE FROM Degree WHERE Degree_id = ?");
-	    stmt.setString(1, degreeIdToDelete);
-	    stmt.executeUpdate();
+        	stmt.setString(1, degreeIdToDelete);
+        	stmt.executeUpdate();
         } else {
             System.out.println("Permission level not high enough to perform this operation");
         }
     }
 
     /**
+     * Method to remove a Module from the University database
      * @param currentUser The currently logged in user
      * @param moduleId the ID of the module that is to be deleted
      * @param con The open connection to the database
@@ -59,8 +61,8 @@ public class SystemsOperations {
         try {
         	if (currentUser.permissionCheck() >= 4) {
 	            //Database is set up so that it will cascade and delete any data that relies on this
-            	    stmt = con.prepareStatement("DELETE FROM Modules WHERE Module_id = ?");
-	            stmt.setString(1, departmentToDelete);
+        	    stmt = con.prepareStatement("DELETE FROM Modules WHERE Module_id = ?");
+	            stmt.setString(1, moduleId);
 	            stmt.executeUpdate();
     		} else {
         		System.out.println("Permission level not high enough to perform this operation");
@@ -72,7 +74,7 @@ public class SystemsOperations {
     }
    	
     /**	
-     * 	
+     * Method to remove a User from the University database
      * @param currentUser The currently logged in user	
      * @param delUser The user that is to be deleted
      * @param con The open connection to the database	
@@ -82,9 +84,32 @@ public class SystemsOperations {
 	PreparedStatement stmt = null;
         try {
         	if (currentUser.permissionCheck() >= 3) {
-		    //Database is set up so that it will cascade and delete any data that relies on this
-                    stmt = con.prepareStatement("DELETE FROM User WHERE Username = ?");
-	            stmt.setString(1, delUser.getRegistrationNumber);
+        		//Database is set up so that it will cascade and delete any data that relies on this
+                stmt = con.prepareStatement("DELETE FROM User WHERE Username = ?");
+	            stmt.setString(1, delUser.getRegistrationNumber());
+	            stmt.executeUpdate();
+    		} else {	
+        		System.out.println("Permission level not high enough to perform this operation");	
+        	}	
+        } catch (SQLException e) {	
+            e.printStackTrace(System.err);	
+        }	
+    }	
+    
+    /**	
+     * Method to remove a Student from the University database
+     * @param currentUser The currently logged in user	
+     * @param delUser The user that is to be deleted
+     * @param con The open connection to the database	
+     * @throws SQLException Will print out the error with the database if one is encountered	
+     */	
+    public static void deleteStudent (User currentUser, User delStudent, Connection con) throws SQLException {
+	PreparedStatement stmt = null;
+        try {
+        	if ((currentUser.permissionCheck() >= 3) && (delStudent.permissionCheck() == 2)) {
+        		//Database is set up so that it will cascade and delete any data that relies on this
+                stmt = con.prepareStatement("DELETE FROM User WHERE Username = ?");
+	            stmt.setString(1, delStudent.getRegistrationNumber());
 	            stmt.executeUpdate();
     		} else {	
         		System.out.println("Permission level not high enough to perform this operation");	
@@ -95,7 +120,7 @@ public class SystemsOperations {
     }	
     	
     /**	
-     * 	
+     * Method to remove a Module that a student studies from the University database
      * @param currentUser The currently logged in user	
      * @param userToRemove The user that is to be deleted
      * @param moduleId The ID of the module that is to be deleted	
@@ -107,7 +132,7 @@ public class SystemsOperations {
         try {	
         	if (currentUser.permissionCheck() >= 3) {	
 	            //Database is set up so that it will cascade and delete any data that relies on this
-                    stmt = con.prepareStatement("DELETE FROM Student_Module WHERE Module_id = ? AND Username = ?");
+                stmt = con.prepareStatement("DELETE FROM Student_Module WHERE Module_id = ? AND Username = ?");
 	            stmt.setString(1, moduleId);
 	            stmt.setString(2, userToRemove.getRegistrationNumber());
 	            stmt.executeUpdate();
@@ -120,29 +145,35 @@ public class SystemsOperations {
     }	
     	
     /**	
-     * 	
+     * Method to remove a Module from the Degree-Module relational table from the University database
      * @param currentUser The currently logged in user	
-     * @param moduleId The ID of the module that is to be deleted	
+     * @param moduleId The ID of the module that is to be deleted
+     * @param degreeId the ID of the degree the module is being removed from
      * @param con The open connection to the database	
      * @throws SQLException Will print out the error with the database if one is encountered	
      */	
-    public static void deleteDegModAprov (User currentUser, String moduleId, Connection con) throws SQLException {
+    public static void deleteDegModAprov (User currentUser, String moduleId, String degreeId, Connection con) throws SQLException {
 	PreparedStatement stmt = null;
         try {
         	if (currentUser.permissionCheck() >= 3) {	
 	            //Database is set up so that it will cascade and delete any data that relies on this
-                    stmt = con.prepareStatement("DELETE FROM Degree_Module_Approved WHERE Module_id = ?");
+
+                stmt = con.prepareStatement("DELETE FROM Degree_Module_Approved WHERE Module_id = ? AND Degree_id = ?");
 	            stmt.setString(1, moduleId);
+	            stmt.setString(2,degreeId);
 	            stmt.executeUpdate();
     		} else {	
         		System.out.println("Permission level not high enough to perform this operation");	
         	}	
         } catch (SQLException e) {	
             e.printStackTrace(System.err);	
-        }	
+        } finally {
+            if(stmt!=null) stmt.close();
+        }
     }
 
     /**
+     * Method to remove an Optional Module from a student in the University database
      * @param currentUser The currently logged in user
      * @param userToDropFrom The user that we want to drop the module from
      * @param moduleId The id of the module we want to drop from the user
@@ -169,20 +200,21 @@ public class SystemsOperations {
     \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
 
     /**
+     * Method to add a Department to the University database
      * @param currentUser The user that is currently logged in
      * @param departmentCode The code of the department that is being added
      * @param departmentName The name of the department that is being added
-     * @param con Current connection to the database
+     * @param con The currently open connection to the database
      * @throws SQLException Will print out the error with the database if one is encountered
      */
     public static void addDepartment (User currentUser, String departmentCode, String departmentName, Connection con) throws SQLException {
-		Statement stmt;
+	PreparedStatement stmt = null;
         try {
         	if (currentUser.permissionCheck() >= 4) {
-	            stmt = con.createStatement();
-	            String query = "INSERT INTO Department " +
-	                    "VALUES ('" + departmentCode + "', '" + departmentName + "')";
-	            stmt.executeUpdate(query);
+	            stmt = con.prepareStatement("INSERT INTO Department VALUES (?, ?)");
+	            stmt.setString(1, departmentCode);
+	            stmt.setString(2, departmentName);
+	            stmt.executeUpdate();
         	} else {
         		System.out.println("Permission level not high enough to perform this operation");
         	}
@@ -192,6 +224,7 @@ public class SystemsOperations {
     }
 
     /**
+     * Method to add a Degree to the University database
      * @param currentUser The currently logged in user
      * @param degreeId The ID of the degree to add
      * @param degreeName The name of the degree to add
@@ -201,20 +234,21 @@ public class SystemsOperations {
      * @throws SQLException Throws and prints the error if there is an issue with the database
      */
     public static boolean addDegree (User currentUser, String degreeId, String degreeName, String departmentCode, Connection con) throws SQLException {
-		Statement stmt = null;
-		ResultSet rs = null;
+	PreparedStatement stmt = null;
+	PreparedStatement stmt2 = null;
+	ResultSet rs = null;
         try {
         	if (currentUser.permissionCheck() >= 4) {
-	            stmt = con.createStatement();
-	            String query = "SELECT  Department_Name " +
-	                    "FROM Department " +
-	                    "WHERE Department_Code = '" + departmentCode + "'";
-	            rs = stmt.executeQuery(query);
-	            //Check if the department that was inputted exists
+	            stmt = con.prepareStatement("SELECT Department_Name FROM Deparment WHERE Deparment_Code = ?");
+	            stmt.setString(1, departmentCode);
+	            rs = stmt.executeQuery();
+	            //Check if the department that was inputed exists
 	            if (rs.next()) {
-	                query = "INSERT INTO Degree " +
-	                        "VALUES ('" + degreeId + "', '" + degreeName + "', '" + departmentCode + "')";
-	                stmt.executeUpdate(query);
+            		stmt2 = con.prepareStatement("INSERT INTO Degree VALUES (?, ?, ?)");
+            		stmt2.setString(1, degreeId);
+            		stmt2.setString(2, degreeName);
+            		stmt2.setString(3, departmentCode);
+	                stmt2.executeUpdate();
 	                return true;
 	            } else {
 	                return false;
@@ -231,7 +265,7 @@ public class SystemsOperations {
     }
 
     /**
-     * 
+     * Method to add a Module to the University database
      * @param currentUser The currently logged in user
      * @param moduleId The ID of the Module to add
      * @param moduleName The name of the Module to add
@@ -244,24 +278,31 @@ public class SystemsOperations {
      * @throws SQLException Throws and prints the error if there is an issue with the database
      */
     public static boolean addModule  (User currentUser, String moduleId, String moduleName, int credits, char level, boolean compulsory, String degreeId, Connection con) throws SQLException {
-		Statement stmt = null;
-		ResultSet rs = null;
+	PreparedStatement stmt = null;
+	PreparedStatement stmt2 = null;
+	PreparedStatement stmt3 = null;
+	ResultSet rs = null;
         try {
         	if (currentUser.permissionCheck() >= 4) {
-	            stmt = con.createStatement();
-	            String query = "SELECT Degree_Name " +
-	                    "FROM Degree " +
-	                    "WHERE Degree_id = '" + degreeId + "'";
-	            rs = stmt.executeQuery(query);
-	            //Check to see if the inputted department exists
+	            stmt = con.prepareStatement("SELECT Degree_Name FROM Degree WHERE Degree_id = ?");
+	            stmt.setString(1, degreeId);
+	            rs = stmt.executeQuery();
+	            //Check to see if the inputed department exists
 	            if (rs.next()) {
 	                //First insert into Modules
-	                query = "INSERT INTO Modules " +
-	                        "VALUES ( '" + moduleId + "', '" + moduleName + "', '" + credits + "')";
-	                stmt.executeUpdate(query);
-	                query = "INSERT INTO Degree_Module_Approved " +
-	                        "VALUES ( '" + degreeId + "', '" + level + "', '" + moduleId + "', '" + boolToInt(compulsory) + "')";
-	                stmt.executeUpdate(query);
+	            	stmt2 = con.prepareStatement("INSERT INTO Modules VALUES (?, ?, ?)");
+	            	stmt2.setString(1, moduleId);
+	            	stmt2.setString(2, moduleName);
+	            	stmt2.setInt(3, credits);
+	                stmt2.executeUpdate();
+			
+                	stmt3 = con.prepareStatement("INSERT INTO Degree_Module_Approved VALUES (?, ?, ?, ?)");
+            		stmt3.setString(1, degreeId);
+            		stmt3.setString(2, Character.toString(level));
+            		stmt3.setString(3, moduleId);
+            		stmt3.setInt(4, boolToInt(compulsory));
+	                stmt3.executeUpdate();
+
 	                return true;
 	            } else {
 	                return false;
@@ -279,6 +320,50 @@ public class SystemsOperations {
     }
 
     /**
+     * Method to add a Module to a Degree in the University database
+     * @param currentUser The currently logged in user
+     * @param degreeId The id of the degree to give a module to
+     * @param level The year that the module will be studied
+     * @param moduleId The id of the module that is being added
+     * @param compulsory If the module will be required to be taken by students taking the degree
+     * @param con The currently open connection to the database
+     * @return True if successful, false if an error was encountered
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
+    public static boolean addModuleToDegree (User currentUser, String degreeId, char level, String moduleId, boolean compulsory, Connection con) throws SQLException{
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            if (currentUser.permissionCheck() >= 4) {
+                stmt = con.createStatement();
+                String query = "SELECT Degree_Name " +
+                        "FROM Degree " +
+                        "WHERE Degree_id = '" + degreeId + "'";
+                rs = stmt.executeQuery(query);
+                //Check to see if the inputted department exists
+                if (rs.next()) {
+                    stmt.executeUpdate(query);
+                    query = "INSERT INTO Degree_Module_Approved " +
+                            "VALUES ( '" + degreeId + "', '" + level + "', '" + moduleId + "', '" + boolToInt(compulsory) + "')";
+                    stmt.executeUpdate(query);
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                System.out.println("Permission level not high enough to perform this operation");
+                return false;
+            }
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return false;
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}}
+        }
+    
+    /**
+     * Method to give a Student an optional Module
      * @param currentUser The currently logged in user
      * @param userToAddTo The user we want to add the module to
      * @param moduleId The module we want to add to the specified user
@@ -300,7 +385,55 @@ public class SystemsOperations {
     }
 
     /**
-     *
+     * Method to add a User to the University database
+     * @param currentUser The currently logged in user
+     * @param newUser The user that is to be added
+     * @param con The current connection to the database
+     * @return True if successful and false if not successful
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
+    public static boolean addUser (User currentUser, User newUser, Connection con) throws SQLException {
+		// Check user privilege
+		if ((currentUser.permissionCheck() <= 3) && (newUser.permissionCheck() != 1)) {
+				System.out.println("Permission level not high enough to create a user of this permission level");
+				return false;
+		}
+    	
+    	Statement stmt = null;
+    	Statement stmt2 = null;
+    	ResultSet users = null;
+        try {
+        	//Check to see if the inputed username already exists, if they do, return false
+            stmt = con.createStatement();
+            String query = "SELECT Username " +
+                    "FROM User " +
+					"WHERE Username = " + newUser.getRegistrationNumber();
+            users = stmt.executeQuery(query);
+			if (users.next()){
+				System.out.println("User already exists");
+				return false;
+			}
+			
+			// Insert new User into User tables
+            query = "INSERT INTO User " +
+  		              "VALUES ( " + newUser.getRegistrationNumber() + ", " + newUser.getHash() + ", " + newUser.getTitle() + ", " + newUser.getSurname() +
+  		              ", " + newUser.getOtherNames() + ", " + newUser.getRole() + ", " + newUser.getEmail() + ")";
+            stmt2 = con.createStatement();
+            stmt2.executeUpdate(query);
+            return true;
+        } catch (SQLException e){
+			e.printStackTrace(System.err);
+			return false;
+		} finally {
+			// Close all open resources
+			try { if (users != null) users.close(); } catch (Exception e) {}
+			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+			try { if (stmt2 != null) stmt2.close(); } catch (Exception e) {}
+		}
+    }
+    
+    /**
+     * Method to add a Student to the University database
      * @param currentUser The currently logged in user
      * @param newUser The user that is to be added
      * @param con The current connection to the database
@@ -308,176 +441,8 @@ public class SystemsOperations {
      * @throws SQLException Throws and prints the error if there is an issue with the database
      */
     public static boolean addStudent (User currentUser, User newUser, Connection con) throws SQLException {
-        // Check user privilege
-        if (currentUser.permissionCheck() <= 2) {
-            System.out.println("Permission level not high enough to perform this operation");
-            return false;
-        }
-        Statement stmt = null;
-        Statement stmt2 = null;
-        ResultSet users = null;
-        ResultSet modules = null;
-        try {
-            //Check to see if the inputted username already exists, if they do, return false
-            stmt = con.createStatement();
-            String query = "SELECT Username " +
-                    "FROM User " +
-                    "WHERE Username = '" + newUser.getRegistrationNumber() + "'";
-            users = stmt.executeQuery(query);
-            if (users.next()){
-                System.out.println("User already exists");
-                return false;
-            }
-
-            // Find all compulsory modules for student at their level and degree
-            query = " SELECT Module_id FROM Degree_Module_Approved " +
-                    " WHERE Compulsory = '1' AND Degree_id = '" + newUser.getDegreeId() + "' AND Level = '" + newUser.getLevel() + "'";
-            modules = stmt.executeQuery(query);
-
-            // Insert new Student into User and Student tables
-            query = "INSERT INTO User " +
-                    "VALUES ( '" + newUser.getRegistrationNumber() + "', '" + newUser.getHash() + "', '" + newUser.getTitle() + "', '" + newUser.getSurname() +
-                    "', '" + newUser.getOtherNames() + "', '" + newUser.getRole() + "', '" + newUser.getEmail() + "')";
-            stmt2 = con.createStatement();
-            stmt2.executeUpdate(query);
-            query = "INSERT INTO Student " +
-                    "VALUES ('" + newUser.getRegistrationNumber() + "', '" + newUser.getDegreeId() + "', '" + newUser.getTutorName() + "', '" + newUser.getLevel() +" ')" ;
-            stmt2.executeUpdate(query);
-
-            // Enrol student on all compulsory modules
-            String moduleName;
-            while (modules.next()) {
-                moduleName = "'" + modules.getString(1) + "'";
-                query = "INSERT INTO Student_Module " +
-                        "VALUES ( '" + newUser.getRegistrationNumber() + "', '" + moduleName + "', '0')";
-                stmt2.execute(query);
-            }
-            return true;
-        } catch (SQLException e){
-            e.printStackTrace(System.err);
-            return false;
-        } finally {
-            // Close all open resources
-            try { if (users != null) users.close(); } catch (Exception e) {e.printStackTrace(System.err);}			try { if (modules != null) modules.close(); } catch (Exception e) {e.printStackTrace(System.err);}			try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}			try { if (stmt2 != null) stmt2.close(); } catch (Exception e) {e.printStackTrace(System.err);}		}
-    }
-
-    /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-    \\\\\\\\\\\\\\\GETTING OPERATIONS\\\\\\\\\\\\\\\
-    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
-    /**
-     *
-     * @param usernameInput The username of the user we want to return
-     * @param hashInput The hashed password of the user we want to return
-     * @return user from given or null if no such user
-     * @throws SQLException if error with the database, should still return null
-     */
-    public static User getUser(String usernameInput, String hashInput) throws SQLException { //will have password hash if that gets done
-        Connection con = null;
-        try {
-            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
-            try {
-                Statement stmt = con.createStatement();
-                ResultSet rs;
-
-                String query = "SELECT * FROM User " +
-                        "WHERE Username = '" + usernameInput +
-                        "' AND Hash = '" + hashInput +"'";
-                //String query = "SELECT * FROM User WHERE Username = 'aca17ab' AND Hash = 'hashsash'";
-
-                rs = stmt.executeQuery(query);
-                rs.first();
-
-                String username = rs.getString("Username");
-                String hash = rs.getString("Hash");
-                String title = rs.getString("Title");
-                String surname = rs.getString("Surname");
-                String otherNames = rs.getString("Other_names");
-                String role = rs.getString("Role");
-                String email = rs.getString("Email");
-                con.close();
-                return new User(username, hash, title, surname, otherNames, role, email);
-            } catch (SQLException e) {
-                e.printStackTrace(System.err);
-                return null;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if (con != null) con.close();
-        }
-    }
-
-    public static ArrayList<Degree> getDegrees() throws SQLException{
-        Connection con = null;
-        try {
-            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
-            try {
-                ArrayList<Degree> degrees = new ArrayList<>();
-                Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * FROM Degree");
-                while (rs.next()) {
-                    String id = rs.getString("Degree_id");
-                    String name = rs.getString("Degree_Name");
-                    String code = rs.getString("Department_Code");
-                    degrees.add(new Degree(id, name, code));
-                }
-                con.close();
-                return degrees;
-            } catch (SQLException e) {
-                e.printStackTrace(System.err);
-                return null;
-            }
-        } catch (SQLException e){
-            e.printStackTrace(System.err);
-            return null;
-        }finally {
-            if(con != null) con.close();
-        }
-    }
-
-    public static ArrayList<Department> getDept() throws SQLException{
-        Connection con = null;
-        try {
-            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
-            try {
-                ArrayList<Department> depts = new ArrayList<>();
-                Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * FROM Department");
-                while (rs.next()) {
-                    String id = rs.getString("Department_Code");
-                    String name = rs.getString("Department_Name");
-                    depts.add(new Department(id, name));
-                }
-                con.close();
-                return depts;
-            } catch (SQLException e) {
-                e.printStackTrace(System.err);
-                return null;
-            }
-        } catch (SQLException e){
-            e.printStackTrace(System.err);
-            return null;
-        }finally {
-            if(con != null) con.close();
-        }
-	}
-
-    /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-    \\\\\\\\\\\\\\\ MISC \\\\\\\\\\\\\\\\\\\\\\\\\\\
-    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
-    /**
-    
-	 * 
-	 * @param currentUser The currently logged in user
-	 * @param newUser The user that is to be added
-	 * @param con The current connection to the database
-	 * @return True if successful and false if not successful
-	 * @throws SQLException Throws and prints the error if there is an issue with the database
-	 */
-	public static boolean addUser (User currentUser, User newUser, Connection con) throws SQLException {
 		// Check user privilege
-		if ((currentUser.permissionCheck() <= newUser.permissionCheck()) || (currentUser.permissionCheck() <= 2)) {
+		if ((newUser.permissionCheck() == 1) && (currentUser.permissionCheck() >= 2)) {
 				System.out.println("Permission level not high enough to create a user of this permission level");
 				return false;
 		}
@@ -539,6 +504,274 @@ public class SystemsOperations {
 		}
     }
 
+    /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\GETTING OPERATIONS\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
+    
+    /**
+     * Method to retrieve data about a user from the Database and create a User opject out of it
+     * @param usernameInput The username of the user we want to return
+     * @param hashInput The hashed password of the user we want to return
+     * @return user from given or null if no such user
+     * @throws SQLException if error with the database, should still return null
+     */
+    public static User getUser(String usernameInput, String hashInput) throws SQLException { //will have password hash if that gets done
+        Connection con = null;
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+            try {
+                Statement stmt = con.createStatement();
+                ResultSet rs;
+
+                String query = "SELECT * FROM User " +
+                        "WHERE Username = '" + usernameInput +
+                        "' AND Hash = '" + hashInput +"'";
+
+                rs = stmt.executeQuery(query);
+
+                if(rs.next()) {
+                    String username = rs.getString("Username");
+                    String hash = rs.getString("Hash");
+                    String title = rs.getString("Title");
+                    String surname = rs.getString("Surname");
+                    String otherNames = rs.getString("Other_names");
+                    String role = rs.getString("Role");
+                    String email = rs.getString("Email");
+                    return new User(username, hash, title, surname, otherNames, role, email);
+                }else{
+                    return null;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace(System.err);
+                return null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (con != null) con.close();
+        }
+    }
+
+    /**
+     * Method to create an ArrayList for storing Degree information
+     * @return An ArrayList storing all Degrees and information
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
+    public static ArrayList<Degree> getDegrees() throws SQLException{
+        Connection con = null;
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+            try {
+                ArrayList<Degree> degrees = new ArrayList<>();
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM Degree");
+                while (rs.next()) {
+                    String id = rs.getString("Degree_id");
+                    String name = rs.getString("Degree_Name");
+                    String code = rs.getString("Department_Code");
+                    degrees.add(new Degree(id, name, code));
+                }
+                con.close();
+                return degrees;
+            } catch (SQLException e) {
+                e.printStackTrace(System.err);
+                return null;
+            }
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return null;
+        }finally {
+            if(con != null) con.close();
+        }
+    }
+
+    /**
+     * Method to create an ArrayList for storing Department information
+     * @return an ArrayList storing all Departments and information on them
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
+    public static ArrayList<Department> getDept() throws SQLException{
+        Connection con = null;
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+            try {
+                ArrayList<Department> depts = new ArrayList<>();
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM Department");
+                while (rs.next()) {
+                    String id = rs.getString("Department_Code");
+                    String name = rs.getString("Department_Name");
+                    depts.add(new Department(id, name));
+                }
+                con.close();
+                return depts;
+            } catch (SQLException e) {
+                e.printStackTrace(System.err);
+                return null;
+            }
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return null;
+        }finally {
+            if(con != null) con.close();
+        }
+	}
+
+	public static ArrayList<String> getModIds(User user, Connection con) throws SQLException{
+        Statement stmt = null;
+        ResultSet rs = null;
+        ArrayList<String> modIds = new ArrayList<>();
+        if(user.permissionCheck() >=2){
+            try {
+                stmt = con.createStatement();
+                String query = "SELECT * FROM Modules";
+                rs = stmt.executeQuery(query);
+
+                while (rs.next()){
+                    modIds.add(rs.getString("Module_Id"));
+                }
+                return modIds;
+            } catch (SQLException e) {
+                System.out.println("Could not find module IDs");
+                e.printStackTrace(System.err);
+                return null;
+            } finally {
+                try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+                try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+            }
+        }
+        return null;
+    }
+
+    /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\ MISC \\\\\\\\\\\\\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
+    
+	
+	/**
+	 * Method to give a student all the compulsory modules for their degree and level of study
+	 * @param current The currently logged in user
+	 * @param student The student that is to be given the compulsory modules
+	 * @param con The currently open connection to the database
+	 * @return True if successful, false if an error was encountered
+	 * @throws SQLException Throws and prints the error if there is an issue with the database
+	 */
+	public static boolean giveCompModules(User current, User student, Connection con) throws SQLException {
+		if (student.permissionCheck() == 1 && current.permissionCheck() >= 2) {
+			Statement stmt = null;
+			Statement stmt2 = null;
+			ResultSet modules  = null; 
+			String moduleName = null;
+			try {
+				stmt = con.createStatement();
+				String query = "SELECT Module_id FROM Degree_Module_Approved " +
+						"WHERE Compulsory = '1' AND Degree_id = " + student.getDegreeId() + " AND Level = " + student.getLevel();
+				modules = stmt.executeQuery(query);
+				
+				stmt2 = con.createStatement();
+				while (modules.next()) {
+					moduleName = "'" + modules.getString(1) + "'";
+	            	query = "INSERT INTO Student_Module " +
+	            			"VALUES ( " + student.getRegistrationNumber() + ", " + moduleName + ", '0')";
+	            	stmt2.execute(query);
+					
+				}
+				return true;
+				
+			} catch (SQLException e){
+		        e.printStackTrace(System.err);
+		        return false;
+		    } finally {
+		        try { if (modules != null) modules.close(); } catch (Exception e) {}
+		        try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+		        try { if (stmt2 != null) stmt2.close(); } catch (Exception e) {}
+		    }
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Method to check if a student has passed their level of study and can progress further with their degree
+	 * @param currentUser The currently logged in user
+	 * @param student Check if the student can progress
+	 * @param con The currently open connection to the database
+	 * @return True if successful, false if an error was encountered
+	 * @throws SQLException Throws and prints the error if there is an issue with the database
+	 */
+	public static boolean canProgressStudent (User currentUser, User student, Connection con) throws SQLException {
+		if ((currentUser.permissionCheck() >= 2) && (student.permissionCheck() <= 1)) {
+			if (student.getLevel() == 'P') {
+				return true;
+			}
+			if ((student.getLevel() <= '3') && (student.calculateMeanGrade(con, student.getLevel()) >= 40)) {
+				//allowed to continue = true
+				return true;
+			}
+			if ((student.getLevel() == '4') && (student.calculateMeanGrade(con, student.getLevel()) >= 50)) {
+				//allowed to continue = true
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Method to progress a Student to the next step of their degree
+	 * @param currentUser The currently logged in user
+	 * @param student The student that we want to progress to the next step in their degree
+	 * @param con The currently open connection to the database
+	 * @return true if the student progressed or false if there is a reason they can't be
+	 * @throws SQLException Throws and prints the error if there is an issue with the database
+	 */
+	public static boolean progressStudents(User currentUser, User student, Connection con) throws SQLException {
+		Statement stmt = null;
+		try {
+			stmt = con.createStatement();
+			
+			if (canProgressStudent(currentUser, student, con)) {
+				student.increaseLevel();
+				// change students level in database
+				String query = "UPDATE Student SET " +
+						" Level = '" + student.getLevel() + "'" +
+						" WHERE Username = " + student.getRegistrationNumber();
+				stmt.executeUpdate(query);
+				// give the student new compulsory modules
+				if (student.getLevel() != 'P') {
+					giveCompModules(currentUser, student, con);
+				}
+			}
+		} catch (SQLException e){
+	        e.printStackTrace(System.err);
+	        return false;
+	    } finally {
+	        try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+	    }
+		return false;
+		
+	}
+
+	/**
+	 * Method to graduate a student if the current user has the permission level to do so
+	 * @param currentUser The currently logged in user
+	 * @param userToGraduate The user that we want to graduate
+	 * @param con The currently open connection to the database
+	 * @return An error if unsuccessful
+	 * @throws SQLException Throws and prints the error if there is an issue with the database
+	 */
+    public static String graduateUser(User currentUser, User userToGraduate, Connection con) throws SQLException {
+        try {
+            if (currentUser.permissionCheck() <= 2) {
+                System.out.println("Permission level not high enough to perform this operation");
+                return "This user cannot do this";
+            }
+            return userToGraduate.graduate(con);
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return "Error encountered";
+        }
+    }
 
     private static int boolToInt(Boolean bool){
         if (bool){
@@ -549,6 +782,7 @@ public class SystemsOperations {
     }
 
     /**
+     * Method to change the grade that a user has obtained for a given module
      * @param currentUser The currently logged in user
      * @param userToUpdate The user that we want to update the grades for
      * @param moduleId The module that we are updating the grade for
@@ -567,6 +801,53 @@ public class SystemsOperations {
             e.printStackTrace(System.err);
             return false;
         }
+    }
+    
+    /**
+     * Allows an administrator to change the role of a user between Teacher, Registrar and Administrator
+     * @param currentUser The currently logged in user
+     * @param userToPromote The user that is having their role changed
+     * @param newRole The role to change a user to
+     * @param con The currently open connection to the database
+     * @return Returns true if it is successful and false if it is not
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
+    public static boolean promotePermission (User currentUser, User  userToPromote, String newRole, Connection con) throws SQLException{
+    	PreparedStatement stmt = null;
+    	try {
+    		System.out.println(currentUser.permissionCheck());
+    		if ((currentUser.permissionCheck() == 4) && (userToPromote.permissionCheck() > 1)) {
+    			switch (newRole.toLowerCase()) {
+	    			case "teacher":
+	    				newRole = "Teacher";
+	    				break;
+	    			case "registrar":
+	    				newRole = "Registrar";
+	    				break;
+	    			case "administrator":
+	    				newRole = "Administrator";
+	    				break;
+					default:
+						return false;
+    			}
+    			System.out.println(newRole);
+    			userToPromote.setRole(newRole);
+    			stmt = con.prepareStatement("UPDATE User SET Role = ? WHERE Username = ?");
+    			stmt.setString(1, newRole);
+    			stmt.setString(2, userToPromote.getRegistrationNumber());
+	            stmt.executeUpdate();
+	            return true;
+    		}
+    		else {
+    			return false;
+    		}
+    	} catch (SQLException e) {
+            e.printStackTrace(System.err);
+            return false;
+    	} finally {
+	        try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+	    }
+    	
     }
 
 // Not currently using but leaving it in if we find it useful later for debugging purposes. Following is taken from oracle docs (I think it should be built into jdbc under JDBCTutorialUtilities however this is not working correctly on mine so someone else should check) - Robbie
