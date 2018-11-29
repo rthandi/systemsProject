@@ -35,6 +35,7 @@ public class AppFrame extends JFrame {
         contentPane.revalidate();
         contentPane.repaint();
     }
+    
     public void toAdminPanel(User admin) throws SQLException {
         Container contentPane = getContentPane();
         contentPane.removeAll();
@@ -44,7 +45,26 @@ public class AppFrame extends JFrame {
         contentPane.revalidate();
         contentPane.repaint();
     }
-
+    
+    public void toRegistrarPanel(User registrar) throws SQLException {
+    	Container contentPane = getContentPane();
+    	contentPane.removeAll();
+    	
+    	contentPane.add(new RegistrarPanel(this,registrar));
+    	
+    	contentPane.revalidate();
+    	contentPane.repaint();
+    }
+    
+    public void toTeacherPanel(User teacher) throws SQLException {
+    	Container contentPane = getContentPane();
+    	contentPane.removeAll();
+    	
+    	contentPane.add(new TeacherPanel(this, teacher));
+    	
+    	contentPane.revalidate();
+    	contentPane.repaint();
+    }
 
     public static void main(String[] args) {
         new AppFrame();
