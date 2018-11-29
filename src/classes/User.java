@@ -95,6 +95,14 @@ public class User {
         return (title + " " + otherNames + " " + surname);
     }
     
+    // Setter method
+    public String setRole(String newRole) {
+    	role = newRole;
+    	return role;
+    }
+    
+    
+    // Other
     /**
      * Method to increase the level of a student
      * @return increased student level
