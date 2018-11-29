@@ -2,7 +2,6 @@ package classes;
 import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class SystemsOperations {
 	
@@ -23,8 +22,8 @@ public class SystemsOperations {
         if (currentUser.permissionCheck() >= 4) {
             //Database is set up so that it will cascade and delete any data that relies on this
             stmt = con.prepareStatement("DELETE FROM Department WHERE Deparment_Code = ?");
-	    stmt.setString(1, departmentToDelete);
-	    stmt.executeUpdate();
+            stmt.setString(1, departmentToDelete);
+            stmt.executeUpdate();
         } else {
             System.out.println("Permission level not high enough to perform this operation");
         }
@@ -43,8 +42,8 @@ public class SystemsOperations {
         if (currentUser.permissionCheck() >= 4) {
             //Database is set up so that it will cascade and delete any data that relies on this
             stmt = con.prepareStatement("DELETE FROM Degree WHERE Degree_id = ?");
-	    stmt.setString(1, degreeIdToDelete);
-	    stmt.executeUpdate();
+        	stmt.setString(1, degreeIdToDelete);
+        	stmt.executeUpdate();
         } else {
             System.out.println("Permission level not high enough to perform this operation");
         }
@@ -62,7 +61,7 @@ public class SystemsOperations {
         try {
         	if (currentUser.permissionCheck() >= 4) {
 	            //Database is set up so that it will cascade and delete any data that relies on this
-            	    stmt = con.prepareStatement("DELETE FROM Modules WHERE Module_id = ?");
+        	    stmt = con.prepareStatement("DELETE FROM Modules WHERE Module_id = ?");
 	            stmt.setString(1, moduleId);
 	            stmt.executeUpdate();
     		} else {
@@ -85,9 +84,32 @@ public class SystemsOperations {
 	PreparedStatement stmt = null;
         try {
         	if (currentUser.permissionCheck() >= 3) {
-		    //Database is set up so that it will cascade and delete any data that relies on this
-                    stmt = con.prepareStatement("DELETE FROM User WHERE Username = ?");
+        		//Database is set up so that it will cascade and delete any data that relies on this
+                stmt = con.prepareStatement("DELETE FROM User WHERE Username = ?");
 	            stmt.setString(1, delUser.getRegistrationNumber());
+	            stmt.executeUpdate();
+    		} else {	
+        		System.out.println("Permission level not high enough to perform this operation");	
+        	}	
+        } catch (SQLException e) {	
+            e.printStackTrace(System.err);	
+        }	
+    }	
+    
+    /**	
+     * Method to remove a Student from the University database
+     * @param currentUser The currently logged in user	
+     * @param delUser The user that is to be deleted
+     * @param con The open connection to the database	
+     * @throws SQLException Will print out the error with the database if one is encountered	
+     */	
+    public static void deleteStudent (User currentUser, User delStudent, Connection con) throws SQLException {
+	PreparedStatement stmt = null;
+        try {
+        	if ((currentUser.permissionCheck() >= 3) && (delStudent.permissionCheck() == 2)) {
+        		//Database is set up so that it will cascade and delete any data that relies on this
+                stmt = con.prepareStatement("DELETE FROM User WHERE Username = ?");
+	            stmt.setString(1, delStudent.getRegistrationNumber());
 	            stmt.executeUpdate();
     		} else {	
         		System.out.println("Permission level not high enough to perform this operation");	
@@ -110,7 +132,7 @@ public class SystemsOperations {
         try {	
         	if (currentUser.permissionCheck() >= 3) {	
 	            //Database is set up so that it will cascade and delete any data that relies on this
-                    stmt = con.prepareStatement("DELETE FROM Student_Module WHERE Module_id = ? AND Username = ?");
+                stmt = con.prepareStatement("DELETE FROM Student_Module WHERE Module_id = ? AND Username = ?");
 	            stmt.setString(1, moduleId);
 	            stmt.setString(2, userToRemove.getRegistrationNumber());
 	            stmt.executeUpdate();
@@ -135,7 +157,8 @@ public class SystemsOperations {
         try {
         	if (currentUser.permissionCheck() >= 3) {	
 	            //Database is set up so that it will cascade and delete any data that relies on this
-                    stmt = con.prepareStatement("DELETE FROM Degree_Module_Approved WHERE Module_id = ? AND Degree_id = ?");
+
+                stmt = con.prepareStatement("DELETE FROM Degree_Module_Approved WHERE Module_id = ? AND Degree_id = ?");
 	            stmt.setString(1, moduleId);
 	            stmt.setString(2,degreeId);
 	            stmt.executeUpdate();
@@ -190,8 +213,8 @@ public class SystemsOperations {
         	if (currentUser.permissionCheck() >= 4) {
 	            stmt = con.prepareStatement("INSERT INTO Department VALUES (?, ?)");
 	            stmt.setString(1, departmentCode);
-		    stmt.setString(2, departmentName);
-		    stmt.executeUpdate();
+	            stmt.setString(2, departmentName);
+	            stmt.executeUpdate();
         	} else {
         		System.out.println("Permission level not high enough to perform this operation");
         	}
@@ -212,19 +235,20 @@ public class SystemsOperations {
      */
     public static boolean addDegree (User currentUser, String degreeId, String degreeName, String departmentCode, Connection con) throws SQLException {
 	PreparedStatement stmt = null;
+	PreparedStatement stmt2 = null;
 	ResultSet rs = null;
         try {
         	if (currentUser.permissionCheck() >= 4) {
 	            stmt = con.prepareStatement("SELECT Department_Name FROM Deparment WHERE Deparment_Code = ?");
-		    stmt.setString(1, departmentCode);
+	            stmt.setString(1, departmentCode);
 	            rs = stmt.executeQuery();
-	            //Check if the department that was inputted exists
+	            //Check if the department that was inputed exists
 	            if (rs.next()) {
-			stmt = con.prepareStatement("INSERT INTO Degree VALUES (?, ?, ?)");
-			stmt.setString(1, degreeId);
-			stmt.setString(2, degreeName);
-			stmt.setString(3, departmentCode);
-	                stmt.executeUpdate();
+            		stmt2 = con.prepareStatement("INSERT INTO Degree VALUES (?, ?, ?)");
+            		stmt2.setString(1, degreeId);
+            		stmt2.setString(2, degreeName);
+            		stmt2.setString(3, departmentCode);
+	                stmt2.executeUpdate();
 	                return true;
 	            } else {
 	                return false;
@@ -255,27 +279,30 @@ public class SystemsOperations {
      */
     public static boolean addModule  (User currentUser, String moduleId, String moduleName, int credits, char level, boolean compulsory, String degreeId, Connection con) throws SQLException {
 	PreparedStatement stmt = null;
+	PreparedStatement stmt2 = null;
+	PreparedStatement stmt3 = null;
 	ResultSet rs = null;
         try {
         	if (currentUser.permissionCheck() >= 4) {
 	            stmt = con.prepareStatement("SELECT Degree_Name FROM Degree WHERE Degree_id = ?");
 	            stmt.setString(1, degreeId);
 	            rs = stmt.executeQuery();
-	            //Check to see if the inputted department exists
+	            //Check to see if the inputed department exists
 	            if (rs.next()) {
 	                //First insert into Modules
-			        stmt = con.prepareStatement("INSERT INTO Modules VALUES (?, ?, ?)");
-		        	stmt.setString(1, moduleId);
-        			stmt.setString(2, moduleName);
-			        stmt.setInt(3, credits);
-	                stmt.executeUpdate();
+	            	stmt2 = con.prepareStatement("INSERT INTO Modules VALUES (?, ?, ?)");
+	            	stmt2.setString(1, moduleId);
+	            	stmt2.setString(2, moduleName);
+	            	stmt2.setInt(3, credits);
+	                stmt2.executeUpdate();
 			
-			        stmt = con.prepareStatement("INSERT INTO Degree_Module_Approved VALUES (?, ?, ?, ?)");
-			        stmt.setString(1, degreeId);
-			        stmt.setString(2, Character.toString(level));
-			        stmt.setString(3, moduleId);
-			        stmt.setInt(4, boolToInt(compulsory));
-	                stmt.executeUpdate();
+                	stmt3 = con.prepareStatement("INSERT INTO Degree_Module_Approved VALUES (?, ?, ?, ?)");
+            		stmt3.setString(1, degreeId);
+            		stmt3.setString(2, Character.toString(level));
+            		stmt3.setString(3, moduleId);
+            		stmt3.setInt(4, boolToInt(compulsory));
+	                stmt3.executeUpdate();
+
 	                return true;
 	            } else {
 	                return false;
@@ -367,7 +394,55 @@ public class SystemsOperations {
      */
     public static boolean addUser (User currentUser, User newUser, Connection con) throws SQLException {
 		// Check user privilege
-		if ((currentUser.permissionCheck() <= newUser.permissionCheck()) || (currentUser.permissionCheck() <= 2)) {
+		if ((currentUser.permissionCheck() <= 3) && (newUser.permissionCheck() != 1)) {
+				System.out.println("Permission level not high enough to create a user of this permission level");
+				return false;
+		}
+    	
+    	Statement stmt = null;
+    	Statement stmt2 = null;
+    	ResultSet users = null;
+        try {
+        	//Check to see if the inputed username already exists, if they do, return false
+            stmt = con.createStatement();
+            String query = "SELECT Username " +
+                    "FROM User " +
+					"WHERE Username = " + newUser.getRegistrationNumber();
+            users = stmt.executeQuery(query);
+			if (users.next()){
+				System.out.println("User already exists");
+				return false;
+			}
+			
+			// Insert new User into User tables
+            query = "INSERT INTO User " +
+  		              "VALUES ( " + newUser.getRegistrationNumber() + ", " + newUser.getHash() + ", " + newUser.getTitle() + ", " + newUser.getSurname() +
+  		              ", " + newUser.getOtherNames() + ", " + newUser.getRole() + ", " + newUser.getEmail() + ")";
+            stmt2 = con.createStatement();
+            stmt2.executeUpdate(query);
+            return true;
+        } catch (SQLException e){
+			e.printStackTrace(System.err);
+			return false;
+		} finally {
+			// Close all open resources
+			try { if (users != null) users.close(); } catch (Exception e) {}
+			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+			try { if (stmt2 != null) stmt2.close(); } catch (Exception e) {}
+		}
+    }
+    
+    /**
+     * Method to add a Student to the University database
+     * @param currentUser The currently logged in user
+     * @param newUser The user that is to be added
+     * @param con The current connection to the database
+     * @return True if successful and false if not successful
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
+    public static boolean addStudent (User currentUser, User newUser, Connection con) throws SQLException {
+		// Check user privilege
+		if ((newUser.permissionCheck() == 1) && (currentUser.permissionCheck() >= 2)) {
 				System.out.println("Permission level not high enough to create a user of this permission level");
 				return false;
 		}
@@ -726,6 +801,53 @@ public class SystemsOperations {
             e.printStackTrace(System.err);
             return false;
         }
+    }
+    
+    /**
+     * Allows an administrator to change the role of a user between Teacher, Registrar and Administrator
+     * @param currentUser The currently logged in user
+     * @param userToPromote The user that is having their role changed
+     * @param newRole The role to change a user to
+     * @param con The currently open connection to the database
+     * @return Returns true if it is successful and false if it is not
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
+    public static boolean promotePermission (User currentUser, User  userToPromote, String newRole, Connection con) throws SQLException{
+    	PreparedStatement stmt = null;
+    	try {
+    		System.out.println(currentUser.permissionCheck());
+    		if ((currentUser.permissionCheck() == 4) && (userToPromote.permissionCheck() > 1)) {
+    			switch (newRole.toLowerCase()) {
+	    			case "teacher":
+	    				newRole = "Teacher";
+	    				break;
+	    			case "registrar":
+	    				newRole = "Registrar";
+	    				break;
+	    			case "administrator":
+	    				newRole = "Administrator";
+	    				break;
+					default:
+						return false;
+    			}
+    			System.out.println(newRole);
+    			userToPromote.setRole(newRole);
+    			stmt = con.prepareStatement("UPDATE User SET Role = ? WHERE Username = ?");
+    			stmt.setString(1, newRole);
+    			stmt.setString(2, userToPromote.getRegistrationNumber());
+	            stmt.executeUpdate();
+	            return true;
+    		}
+    		else {
+    			return false;
+    		}
+    	} catch (SQLException e) {
+            e.printStackTrace(System.err);
+            return false;
+    	} finally {
+	        try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+	    }
+    	
     }
 
 // Not currently using but leaving it in if we find it useful later for debugging purposes. Following is taken from oracle docs (I think it should be built into jdbc under JDBCTutorialUtilities however this is not working correctly on mine so someone else should check) - Robbie
