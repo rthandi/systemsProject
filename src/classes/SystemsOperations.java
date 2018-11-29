@@ -574,6 +574,18 @@ public class SystemsOperations {
 		}
     }
 
+    public static String graduateUser(User currentUser, User userToGraduate, Connection con) throws SQLException {
+        try {
+            if (currentUser.permissionCheck() <= 2) {
+                System.out.println("Permission level not high enough to perform this operation");
+                return "This user cannot do this";
+            }
+            return userToGraduate.graduate(con);
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return "Error encountered";
+        }
+    }
 
     private static int boolToInt(Boolean bool){
         if (bool){

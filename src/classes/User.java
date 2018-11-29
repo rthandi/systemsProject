@@ -421,4 +421,66 @@ public class User {
             try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
         }
     }
+
+    public String graduate(Connection con) throws SQLException {
+        try {
+            String output;
+            char level = this.getLevel();
+            //Check if one year MSc
+            if (level == 'P') {
+                int total = this.calculateMeanGrade(con, 'P');
+                //Calculate degree class
+                if (total >= 69.5) {
+                    output = "Distinction";
+                } else if (total >= 59.5) {
+                    output = "Merit";
+                } else if (total >= 49.5) {
+                    output = "Pass";
+                } else {
+                    output = "fail";
+                }
+            } else {
+                int secondYearMark = this.calculateMeanGrade(con, '2');
+                int thirdYearMark = this.calculateMeanGrade(con, '3');
+                //Check current level to see if masters or undergraduate (may be better way of doing this lemme know)
+                if (level == '3') {
+                    //calculate weighted total grade
+                    int total = ((secondYearMark + (thirdYearMark * 2)) / 3);
+                    //Calculate degree class
+                    if (total >= 69.5) {
+                        output = "First class";
+                    } else if (total >= 59.5) {
+                        output = "Upper second";
+                    } else if (total >= 49.5) {
+                        output = "Lower second";
+                    } else if (total >= 44.5) {
+                        output = "Third class";
+                    } else if (total >= 39.5) {
+                        output = "Pass (non-honours)";
+                    } else {
+                        output = "fail";
+                    }
+                } else if (level == '4') {
+                    int fourthYearMark = this.calculateMeanGrade(con, '4');
+                    int total = ((secondYearMark + (thirdYearMark * 2) + (fourthYearMark * 2)) / 5);
+                    //Calculate degree class
+                    if (total >= 69.5) {
+                        output = "First class";
+                    } else if (total >= 59.5) {
+                        output = "Upper second";
+                    } else if (total >= 49.5) {
+                        output = "Lower second";
+                    } else {
+                        output = "fail";
+                    }
+                } else {
+                    output = "Not yet ready for graduation";
+                }
+            }
+            return output;
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+            return "Error encountered";
+        }
+    }
 }
