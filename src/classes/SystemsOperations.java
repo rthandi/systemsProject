@@ -95,6 +95,29 @@ public class SystemsOperations {
             e.printStackTrace(System.err);	
         }	
     }	
+    
+    /**	
+     * Method to remove a Student from the University database
+     * @param currentUser The currently logged in user	
+     * @param delUser The user that is to be deleted
+     * @param con The open connection to the database	
+     * @throws SQLException Will print out the error with the database if one is encountered	
+     */	
+    public static void deleteStudent (User currentUser, User delStudent, Connection con) throws SQLException {
+	PreparedStatement stmt = null;
+        try {
+        	if ((currentUser.permissionCheck() >= 3) && (delStudent.permissionCheck() == 2)) {
+        		//Database is set up so that it will cascade and delete any data that relies on this
+                stmt = con.prepareStatement("DELETE FROM User WHERE Username = ?");
+	            stmt.setString(1, delStudent.getRegistrationNumber());
+	            stmt.executeUpdate();
+    		} else {	
+        		System.out.println("Permission level not high enough to perform this operation");	
+        	}	
+        } catch (SQLException e) {	
+            e.printStackTrace(System.err);	
+        }	
+    }	
     	
     /**	
      * Method to remove a Module that a student studies from the University database
