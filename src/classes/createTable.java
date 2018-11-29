@@ -50,7 +50,7 @@ public class createTable {
 				System.out.println("--- Creating User");
 				sql = "CREATE TABLE User " +
 					 "(Username VARCHAR(8) not NULL, " +
-					 " Hash VARCHAR(50) not NULL," +
+					 " Hash VARCHAR(100) not NULL," +
 					 " Title VARCHAR(5) not NULL, " +
 					 " Surname VARCHAR(50) not NULL, " +
 					 " Other_names VARCHAR(50) not NULL, " +
