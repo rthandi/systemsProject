@@ -442,11 +442,12 @@ public class SystemsOperations {
      */
     public static User getUser(String usernameInput, String hashInput) throws SQLException { //will have password hash if that gets done
         Connection con = null;
+        Statement stmt = null;
+        ResultSet rs = null;
         try {
             con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
             try {
-                Statement stmt = con.createStatement();
-                ResultSet rs;
+                stmt = con.createStatement();
 
                 String query = "SELECT * FROM User " +
                         "WHERE Username = '" + usernameInput +
@@ -471,10 +472,12 @@ public class SystemsOperations {
                 return null;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
             return null;
         } finally {
             if (con != null) con.close();
+            if (stmt != null) stmt.close();
+            if (rs != null) rs.close();
         }
     }
 
