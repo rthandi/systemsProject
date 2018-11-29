@@ -387,7 +387,55 @@ public class SystemsOperations {
      */
     public static boolean addUser (User currentUser, User newUser, Connection con) throws SQLException {
 		// Check user privilege
-		if ((currentUser.permissionCheck() <= newUser.permissionCheck()) || (currentUser.permissionCheck() <= 2)) {
+		if ((currentUser.permissionCheck() <= 3) && (newUser.permissionCheck() != 1)) {
+				System.out.println("Permission level not high enough to create a user of this permission level");
+				return false;
+		}
+    	
+    	Statement stmt = null;
+    	Statement stmt2 = null;
+    	ResultSet users = null;
+        try {
+        	//Check to see if the inputed username already exists, if they do, return false
+            stmt = con.createStatement();
+            String query = "SELECT Username " +
+                    "FROM User " +
+					"WHERE Username = " + newUser.getRegistrationNumber();
+            users = stmt.executeQuery(query);
+			if (users.next()){
+				System.out.println("User already exists");
+				return false;
+			}
+			
+			// Insert new User into User tables
+            query = "INSERT INTO User " +
+  		              "VALUES ( " + newUser.getRegistrationNumber() + ", " + newUser.getHash() + ", " + newUser.getTitle() + ", " + newUser.getSurname() +
+  		              ", " + newUser.getOtherNames() + ", " + newUser.getRole() + ", " + newUser.getEmail() + ")";
+            stmt2 = con.createStatement();
+            stmt2.executeUpdate(query);
+            return true;
+        } catch (SQLException e){
+			e.printStackTrace(System.err);
+			return false;
+		} finally {
+			// Close all open resources
+			try { if (users != null) users.close(); } catch (Exception e) {}
+			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+			try { if (stmt2 != null) stmt2.close(); } catch (Exception e) {}
+		}
+    }
+    
+    /**
+     * Method to add a Student to the University database
+     * @param currentUser The currently logged in user
+     * @param newUser The user that is to be added
+     * @param con The current connection to the database
+     * @return True if successful and false if not successful
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
+    public static boolean addStudent (User currentUser, User newUser, Connection con) throws SQLException {
+		// Check user privilege
+		if ((newUser.permissionCheck() == 1) && (currentUser.permissionCheck() >= 2)) {
 				System.out.println("Permission level not high enough to create a user of this permission level");
 				return false;
 		}
