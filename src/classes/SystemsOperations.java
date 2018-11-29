@@ -1,7 +1,6 @@
 package classes;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class SystemsOperations {
 	
@@ -61,7 +60,7 @@ public class SystemsOperations {
         try {
         	if (currentUser.permissionCheck() >= 4) {
 	            //Database is set up so that it will cascade and delete any data that relies on this
-            	    stmt = con.prepareStatement("DELETE FROM Modules WHERE Module_id = ?");
+        	    stmt = con.prepareStatement("DELETE FROM Modules WHERE Module_id = ?");
 	            stmt.setString(1, moduleId);
 	            stmt.executeUpdate();
     		} else {
@@ -84,8 +83,8 @@ public class SystemsOperations {
 	PreparedStatement stmt = null;
         try {
         	if (currentUser.permissionCheck() >= 3) {
-		    //Database is set up so that it will cascade and delete any data that relies on this
-                    stmt = con.prepareStatement("DELETE FROM User WHERE Username = ?");
+        		//Database is set up so that it will cascade and delete any data that relies on this
+                stmt = con.prepareStatement("DELETE FROM User WHERE Username = ?");
 	            stmt.setString(1, delUser.getRegistrationNumber());
 	            stmt.executeUpdate();
     		} else {	
@@ -132,7 +131,7 @@ public class SystemsOperations {
         try {	
         	if (currentUser.permissionCheck() >= 3) {	
 	            //Database is set up so that it will cascade and delete any data that relies on this
-                    stmt = con.prepareStatement("DELETE FROM Student_Module WHERE Module_id = ? AND Username = ?");
+                stmt = con.prepareStatement("DELETE FROM Student_Module WHERE Module_id = ? AND Username = ?");
 	            stmt.setString(1, moduleId);
 	            stmt.setString(2, userToRemove.getRegistrationNumber());
 	            stmt.executeUpdate();
@@ -156,7 +155,7 @@ public class SystemsOperations {
         try {
         	if (currentUser.permissionCheck() >= 3) {	
 	            //Database is set up so that it will cascade and delete any data that relies on this
-                    stmt = con.prepareStatement("DELETE FROM Degree_Module_Approved WHERE Module_id = ?");
+                stmt = con.prepareStatement("DELETE FROM Degree_Module_Approved WHERE Module_id = ?");
 	            stmt.setString(1, moduleId);
 	            stmt.executeUpdate();
     		} else {	
@@ -208,8 +207,8 @@ public class SystemsOperations {
         	if (currentUser.permissionCheck() >= 4) {
 	            stmt = con.prepareStatement("INSERT INTO Department VALUES (?, ?)");
 	            stmt.setString(1, departmentCode);
-		    stmt.setString(2, departmentName);
-		    stmt.executeUpdate();
+	            stmt.setString(2, departmentName);
+	            stmt.executeUpdate();
         	} else {
         		System.out.println("Permission level not high enough to perform this operation");
         	}
@@ -230,19 +229,20 @@ public class SystemsOperations {
      */
     public static boolean addDegree (User currentUser, String degreeId, String degreeName, String departmentCode, Connection con) throws SQLException {
 	PreparedStatement stmt = null;
+	PreparedStatement stmt2 = null;
 	ResultSet rs = null;
         try {
         	if (currentUser.permissionCheck() >= 4) {
 	            stmt = con.prepareStatement("SELECT Department_Name FROM Deparment WHERE Deparment_Code = ?");
-		    stmt.setString(1, departmentCode);
+	            stmt.setString(1, departmentCode);
 	            rs = stmt.executeQuery();
-	            //Check if the department that was inputted exists
+	            //Check if the department that was inputed exists
 	            if (rs.next()) {
-			stmt = con.prepareStatement("INSERT INTO Degree VALUES (?, ?, ?)");
-			stmt.setString(1, degreeId);
-			stmt.setString(2, degreeName);
-			stmt.setString(3, departmentCode);
-	                stmt.executeUpdate();
+            		stmt2 = con.prepareStatement("INSERT INTO Degree VALUES (?, ?, ?)");
+            		stmt2.setString(1, degreeId);
+            		stmt2.setString(2, degreeName);
+            		stmt2.setString(3, departmentCode);
+	                stmt2.executeUpdate();
 	                return true;
 	            } else {
 	                return false;
@@ -273,27 +273,29 @@ public class SystemsOperations {
      */
     public static boolean addModule  (User currentUser, String moduleId, String moduleName, int credits, char level, boolean compulsory, String degreeId, Connection con) throws SQLException {
 	PreparedStatement stmt = null;
+	PreparedStatement stmt2 = null;
+	PreparedStatement stmt3 = null;
 	ResultSet rs = null;
         try {
         	if (currentUser.permissionCheck() >= 4) {
 	            stmt = con.prepareStatement("SELECT Degree_Name FROM Degree WHERE Degree_id = ?");
 	            stmt.setString(1, degreeId);
 	            rs = stmt.executeQuery();
-	            //Check to see if the inputted department exists
+	            //Check to see if the inputed department exists
 	            if (rs.next()) {
 	                //First insert into Modules
-			stmt = con.prepareStatement("INSERT INTO Modules VALUES (?, ?, ?)");
-			stmt.setString(1, moduleId);
-			stmt.setString(2, moduleName);
-			stmt.setInt(3, credits);
-	                stmt.executeUpdate();
+	            	stmt2 = con.prepareStatement("INSERT INTO Modules VALUES (?, ?, ?)");
+	            	stmt2.setString(1, moduleId);
+	            	stmt2.setString(2, moduleName);
+	            	stmt2.setInt(3, credits);
+	                stmt2.executeUpdate();
 			
-			stmt = con.prepareStatement("INSERT INTO Degree_Module_Approved VALUES (?, ?, ?, ?)");
-			stmt.setString(1, degreeId);
-			stmt.setString(2, Character.toString(level));
-			stmt.setString(3, moduleId);
-			stmt.setInt(4, boolToInt(compulsory));
-	                stmt.executeUpdate();
+                	stmt3 = con.prepareStatement("INSERT INTO Degree_Module_Approved VALUES (?, ?, ?, ?)");
+            		stmt3.setString(1, degreeId);
+            		stmt3.setString(2, Character.toString(level));
+            		stmt3.setString(3, moduleId);
+            		stmt3.setInt(4, boolToInt(compulsory));
+	                stmt3.executeUpdate();
 	                return true;
 	            } else {
 	                return false;
