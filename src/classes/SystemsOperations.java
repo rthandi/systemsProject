@@ -21,8 +21,8 @@ public class SystemsOperations {
         if (currentUser.permissionCheck() >= 4) {
             //Database is set up so that it will cascade and delete any data that relies on this
             stmt = con.prepareStatement("DELETE FROM Department WHERE Deparment_Code = ?");
-	    stmt.setString(1, departmentToDelete);
-	    stmt.executeUpdate();
+            stmt.setString(1, departmentToDelete);
+            stmt.executeUpdate();
         } else {
             System.out.println("Permission level not high enough to perform this operation");
         }
@@ -41,8 +41,8 @@ public class SystemsOperations {
         if (currentUser.permissionCheck() >= 4) {
             //Database is set up so that it will cascade and delete any data that relies on this
             stmt = con.prepareStatement("DELETE FROM Degree WHERE Degree_id = ?");
-	    stmt.setString(1, degreeIdToDelete);
-	    stmt.executeUpdate();
+        	stmt.setString(1, degreeIdToDelete);
+        	stmt.executeUpdate();
         } else {
             System.out.println("Permission level not high enough to perform this operation");
         }
@@ -767,6 +767,53 @@ public class SystemsOperations {
             e.printStackTrace(System.err);
             return false;
         }
+    }
+    
+    /**
+     * Allows an administrator to change the role of a user between Teacher, Registrar and Administrator
+     * @param currentUser The currently logged in user
+     * @param userToPromote The user that is having their role changed
+     * @param newRole The role to change a user to
+     * @param con The currently open connection to the database
+     * @return Returns true if it is successful and false if it is not
+     * @throws SQLException Throws and prints the error if there is an issue with the database
+     */
+    public static boolean promotePermission (User currentUser, User  userToPromote, String newRole, Connection con) throws SQLException{
+    	PreparedStatement stmt = null;
+    	try {
+    		System.out.println(currentUser.permissionCheck());
+    		if ((currentUser.permissionCheck() == 4) && (userToPromote.permissionCheck() > 1)) {
+    			switch (newRole.toLowerCase()) {
+	    			case "teacher":
+	    				newRole = "Teacher";
+	    				break;
+	    			case "registrar":
+	    				newRole = "Registrar";
+	    				break;
+	    			case "administrator":
+	    				newRole = "Administrator";
+	    				break;
+					default:
+						return false;
+    			}
+    			System.out.println(newRole);
+    			userToPromote.setRole(newRole);
+    			stmt = con.prepareStatement("UPDATE User SET Role = ? WHERE Username = ?");
+    			stmt.setString(1, newRole);
+    			stmt.setString(2, userToPromote.getRegistrationNumber());
+	            stmt.executeUpdate();
+	            return true;
+    		}
+    		else {
+    			return false;
+    		}
+    	} catch (SQLException e) {
+            e.printStackTrace(System.err);
+            return false;
+    	} finally {
+	        try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+	    }
+    	
     }
 
 // Not currently using but leaving it in if we find it useful later for debugging purposes. Following is taken from oracle docs (I think it should be built into jdbc under JDBCTutorialUtilities however this is not working correctly on mine so someone else should check) - Robbie
