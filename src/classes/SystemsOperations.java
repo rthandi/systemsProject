@@ -1,4 +1,5 @@
 package classes;
+import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -124,24 +125,28 @@ public class SystemsOperations {
     /**	
      * Method to remove a Module from the Degree-Module relational table from the University database
      * @param currentUser The currently logged in user	
-     * @param moduleId The ID of the module that is to be deleted	
+     * @param moduleId The ID of the module that is to be deleted
+     * @param degreeId the ID of the degree the module is being removed from
      * @param con The open connection to the database	
      * @throws SQLException Will print out the error with the database if one is encountered	
      */	
-    public static void deleteDegModAprov (User currentUser, String moduleId, Connection con) throws SQLException {
+    public static void deleteDegModAprov (User currentUser, String moduleId, String degreeId, Connection con) throws SQLException {
 	PreparedStatement stmt = null;
         try {
         	if (currentUser.permissionCheck() >= 3) {	
 	            //Database is set up so that it will cascade and delete any data that relies on this
-                    stmt = con.prepareStatement("DELETE FROM Degree_Module_Approved WHERE Module_id = ?");
+                    stmt = con.prepareStatement("DELETE FROM Degree_Module_Approved WHERE Module_id = ? AND Degree_id = ?");
 	            stmt.setString(1, moduleId);
+	            stmt.setString(2,degreeId);
 	            stmt.executeUpdate();
     		} else {	
         		System.out.println("Permission level not high enough to perform this operation");	
         	}	
         } catch (SQLException e) {	
             e.printStackTrace(System.err);	
-        }	
+        } finally {
+            if(stmt!=null) stmt.close();
+        }
     }
 
     /**
@@ -259,17 +264,17 @@ public class SystemsOperations {
 	            //Check to see if the inputted department exists
 	            if (rs.next()) {
 	                //First insert into Modules
-			stmt = con.prepareStatement("INSERT INTO Modules VALUES (?, ?, ?)");
-			stmt.setString(1, moduleId);
-			stmt.setString(2, moduleName);
-			stmt.setInt(3, credits);
+			        stmt = con.prepareStatement("INSERT INTO Modules VALUES (?, ?, ?)");
+		        	stmt.setString(1, moduleId);
+        			stmt.setString(2, moduleName);
+			        stmt.setInt(3, credits);
 	                stmt.executeUpdate();
 			
-			stmt = con.prepareStatement("INSERT INTO Degree_Module_Approved VALUES (?, ?, ?, ?)");
-			stmt.setString(1, degreeId);
-			stmt.setString(2, Character.toString(level));
-			stmt.setString(3, moduleId);
-			stmt.setInt(4, boolToInt(compulsory));
+			        stmt = con.prepareStatement("INSERT INTO Degree_Module_Approved VALUES (?, ?, ?, ?)");
+			        stmt.setString(1, degreeId);
+			        stmt.setString(2, Character.toString(level));
+			        stmt.setString(3, moduleId);
+			        stmt.setInt(4, boolToInt(compulsory));
 	                stmt.executeUpdate();
 	                return true;
 	            } else {
@@ -448,6 +453,7 @@ public class SystemsOperations {
                         "' AND Hash = '" + hashInput +"'";
 
                 rs = stmt.executeQuery(query);
+
                 if(rs.next()) {
                     String username = rs.getString("Username");
                     String hash = rs.getString("Hash");
@@ -536,6 +542,32 @@ public class SystemsOperations {
             if(con != null) con.close();
         }
 	}
+
+	public static ArrayList<String> getModIds(User user, Connection con) throws SQLException{
+        Statement stmt = null;
+        ResultSet rs = null;
+        ArrayList<String> modIds = new ArrayList<>();
+        if(user.permissionCheck() >=2){
+            try {
+                stmt = con.createStatement();
+                String query = "SELECT * FROM Modules";
+                rs = stmt.executeQuery(query);
+
+                while (rs.next()){
+                    modIds.add(rs.getString("Module_Id"));
+                }
+                return modIds;
+            } catch (SQLException e) {
+                System.out.println("Could not find module IDs");
+                e.printStackTrace(System.err);
+                return null;
+            } finally {
+                try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+                try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+            }
+        }
+        return null;
+    }
 
     /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     \\\\\\\\\\\\\\\ MISC \\\\\\\\\\\\\\\\\\\\\\\\\\\
