@@ -1,5 +1,6 @@
 package classes;
 
+import javax.print.DocFlavor;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -168,9 +169,9 @@ public class User {
 
 
     private boolean validateTotalCreditsCorrect(int numberOfCredits) {
-        String level = this.getDegreeId().substring(3, 4);
-        //If U then it is undergrad
-        if (Objects.equals(level, "U")) {
+        char level = this.getLevel();
+        //If 1, 2, or 3 then it is 120 credits
+        if (level == 1 || level == 2 || level ==  3) {
             return numberOfCredits == 120;
         } else {
             return numberOfCredits == 180;
@@ -178,9 +179,9 @@ public class User {
     }
 
     private boolean validateTotalCreditsUnder(int numberOfCredits){
-        String level = this.getDegreeId().substring(3, 4);
-        //If U then it is undergrad
-        if (Objects.equals(level, "U")) {
+        char level = this.getLevel();
+        //If 1, 2, or 3 then it is 120 credits
+        if (level == 1 || level == 2 || level ==  3) {
             return numberOfCredits <= 120;
         } else {
             return numberOfCredits <= 180;
@@ -458,6 +459,140 @@ public class User {
         } finally {
             try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
             try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+        }
+    }
+
+    public String graduate(Connection con) throws SQLException {
+        ResultSet rs = null;
+        Statement stmt = null;
+        try {
+            String output;
+            char level = this.getLevel();
+            //Check if one year MSc
+            if (Objects.equals(this.getDegreeId().substring(3, 4), "P")) {
+                //Check if dissertation was passed
+                stmt = con.createStatement();
+                String query = "SELECT Student_Module.Mark, Credits " +
+                        "FROM Student_Module " +
+                        "INNER JOIN Modules " +
+                        "ON Student_Module.Module_id = Modules.Module_id " +
+                        "WHERE Student_Module.Username = '" + this.getRegistrationNumber() + "'";
+                rs = stmt.executeQuery(query);
+                boolean passedDissertation = true;
+                ArrayList<Grade> gradeList = new ArrayList<>();
+                while (rs.next()){
+                    if (rs.getInt("Credits") == 60){
+                        if(rs.getInt("Mark") <= 49.5){
+                            passedDissertation = false;
+                        } else {
+                            gradeList.add(new Grade(rs.getInt("Mark"), rs.getInt("Credits")));
+                        }
+                    }
+                }
+                if (!passedDissertation){
+                    //dissertation failed. Check to see if they qualify for a PGDip
+                    int amountOfCreditsPassed = 0;
+                    boolean concededUsed = false;
+                    for (Grade aGradeList : gradeList) {
+                        if (aGradeList.getGrade() >= 49.5) {
+                            //Module passed add credits to total
+                            amountOfCreditsPassed += aGradeList.getCredits();
+                        } else if (!concededUsed && aGradeList.getGrade()>= 39.5){
+                            amountOfCreditsPassed += aGradeList.getCredits();
+                            concededUsed = true;
+                        }
+                    }
+                    if (amountOfCreditsPassed == 120){
+                        output = "Failed dissertation, PGDip awarded";
+                    } else {
+                        output = "fail";
+                    }
+                } else {
+                    int total = this.calculateMeanGrade(con, 'P');
+                    //Calculate degree class
+                    if (total >= 69.5) {
+                        output = "Distinction";
+                    } else if (total >= 59.5) {
+                        output = "Merit";
+                    } else if (total >= 49.5) {
+                        output = "Pass";
+                    } else {
+                        //Failed, check for PGCert
+                        int amountOfCreditsPassed = 0;
+                        for (Grade aGradeList : gradeList) {
+                            if (aGradeList.getGrade() >= 49.5) {
+                                //Module passed add credits to total
+                                amountOfCreditsPassed += aGradeList.getCredits();
+                            }
+                        }
+                        if (amountOfCreditsPassed >= 60) {
+                            output = "Qualified for PGCert";
+                        } else {
+                            output = "Failed";
+                        }
+                    }
+                }
+            } else {
+                int secondYearMark = this.calculateMeanGrade(con, '2');
+                int thirdYearMark = this.calculateMeanGrade(con, '3');
+                //Check current level to see if masters or undergraduate (may be better way of doing this lemme know)
+                if (level == '3') {
+                    //calculate weighted total grade
+                    int total = ((secondYearMark + (thirdYearMark * 2)) / 3);
+                    //Calculate degree class
+                    if (total >= 69.5) {
+                        output = "First class";
+                    } else if (total >= 59.5) {
+                        output = "Upper second";
+                    } else if (total >= 49.5) {
+                        output = "Lower second";
+                    } else if (total >= 44.5) {
+                        output = "Third class";
+                    } else if (total >= 39.5) {
+                        output = "Pass (non-honours)";
+                    } else {
+                        output = "fail";
+                    }
+                } else if (level == '4') {
+                    int fourthYearMark = this.calculateMeanGrade(con, '4');
+                    int total = ((secondYearMark + (thirdYearMark * 2) + (fourthYearMark * 2)) / 5);
+                    //Calculate degree class
+                    if (total >= 69.5) {
+                        output = "First class";
+                    } else if (total >= 59.5) {
+                        output = "Upper second";
+                    } else if (total >= 49.5) {
+                        output = "Lower second";
+                    } else {
+                        //They graduate with a bachelor's
+                        //calculate weighted total grade
+                        total = ((secondYearMark + (thirdYearMark * 2)) / 3);
+                        //Calculate degree class
+                        if (total >= 69.5) {
+                            output = "Failed fourth level: graduate with bachelor's first class";
+                        } else if (total >= 59.5) {
+                            output = "Failed fourth level: graduate with bachelor's upper second";
+                        } else if (total >= 49.5) {
+                            output = "Failed fourth level: graduate with bachelor's lower second";
+                        } else if (total >= 44.5) {
+                            output = "Failed fourth level: graduate with bachelor's third class";
+                        } else if (total >= 39.5) {
+                            output = "Failed fourth level: graduate with bachelor's pass (non-honours)";
+                        } else {
+                            output = "fail";
+                        }
+                    }
+                } else {
+                    output = "Not yet ready for graduation";
+                }
+            }
+            return output;
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+            return "Error encountered";
+        } finally {
+        try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+        try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
         }
     }
 }

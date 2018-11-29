@@ -209,7 +209,7 @@ public class SystemsOperations {
 	            rs = stmt.executeQuery();
 	            //Check if the department that was inputted exists
 	            if (rs.next()) {
-			stmt = con.prepareStatemnt("INSERT INTO Degree VALUES (?, ?, ?)");
+			stmt = con.prepareStatement("INSERT INTO Degree VALUES (?, ?, ?)");
 			stmt.setString(1, degreeId);
 			stmt.setString(2, degreeName);
 			stmt.setString(3, departmentCode);
@@ -253,15 +253,15 @@ public class SystemsOperations {
 	            //Check to see if the inputted department exists
 	            if (rs.next()) {
 	                //First insert into Modules
-			stmt = con.prepareStatemnt("INSERT INTO Modules VALUES (?, ?, ?)");
+			stmt = con.prepareStatement("INSERT INTO Modules VALUES (?, ?, ?)");
 			stmt.setString(1, moduleId);
 			stmt.setString(2, moduleName);
 			stmt.setInt(3, credits);
 	                stmt.executeUpdate();
 			
-			stmt = con.prepareStatemnt("INSERT INTO Degree_Module_Approved VALUES (?, ?, ?, ?)");
+			stmt = con.prepareStatement("INSERT INTO Degree_Module_Approved VALUES (?, ?, ?, ?)");
 			stmt.setString(1, degreeId);
-			stmt.setChar(2, String.valueOf(level));
+			stmt.setString(2, Character.toString(level));
 			stmt.setString(3, moduleId);
 			stmt.setInt(4, boolToInt(compulsory));
 	                stmt.executeUpdate();
@@ -674,6 +674,18 @@ public class SystemsOperations {
 		
 	}
 
+    public static String graduateUser(User currentUser, User userToGraduate, Connection con) throws SQLException {
+        try {
+            if (currentUser.permissionCheck() <= 2) {
+                System.out.println("Permission level not high enough to perform this operation");
+                return "This user cannot do this";
+            }
+            return userToGraduate.graduate(con);
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+            return "Error encountered";
+        }
+    }
 
     private static int boolToInt(Boolean bool){
         if (bool){
