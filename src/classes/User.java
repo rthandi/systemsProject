@@ -1,10 +1,7 @@
 package classes;
 
 import javax.print.DocFlavor;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -48,6 +45,10 @@ public class User {
         otherNames = otherNamesInput;
         role = roleInput;
         email = emailInput;
+
+        degreeId = null;
+        tutorName = null;
+        level = ' ';
 
     }
     /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -94,7 +95,22 @@ public class User {
     public String getFullName(){
         return (title + " " + otherNames + " " + surname);
     }
-    
+
+    /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\SETTER METHODS\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
+    public void setDegreeId(String degId){
+        degreeId = degId;
+    }
+
+    public void setTutor(String tutorNameInput){
+        tutorName = tutorNameInput;
+    }
+
+    public void setLevel(char levelInput){
+        level = levelInput;
+    }
+
     /**
      * Method to increase the level of a student
      * @return increased student level
@@ -167,6 +183,7 @@ public class User {
             try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
             try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}		}
     }
+
 
 
     /**
@@ -616,5 +633,68 @@ public class User {
         try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
         try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
         }
+    }
+
+    /**
+     * Makes a user into a student if it is possible, if not nothing changes
+     * @return student version of the user
+     */
+    public void toStudent(Connection con) throws SQLException{
+        Statement stmt = null;
+        ResultSet rs = null;
+        try{
+            stmt = con.createStatement();
+            String query = "SELECT * FROM Student" +
+                    " WHERE Username = '" + getRegistrationNumber()+"'";
+            rs = stmt.executeQuery(query);
+            while(rs.next()){
+                String degreeId = rs.getString("Degree_id");
+                String tutor = rs.getString("Tutor");
+                char level = rs.getString("Level").charAt(0);
+
+                setDegreeId(degreeId);
+                setTutor(tutor);
+                setLevel(level);
+            }
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+        } finally {
+            if (stmt != null) stmt.close();
+            if (rs != null) rs.close();
+        }
+    }
+
+    /**
+     *
+     */
+    public ArrayList<StudentModsGrades> getGrades(Connection con){
+        Statement stmt = null;
+        ResultSet rs = null;
+        ArrayList<StudentModsGrades> grades = new ArrayList<>();
+        try{
+            stmt = con.createStatement();
+            String query = "SELECT Module_id, Module_Name, Student_Module.Mark, Credits " +
+                    "FROM Student_Module " +
+                    "INNER JOIN Modules " +
+                    "ON Student_Module.Module_id = Modules.Module_id " +
+                    "WHERE Student_Module.Username = '" + this.getRegistrationNumber() + "'";
+            rs = stmt.executeQuery(query);
+
+            while(rs.next()){
+                String modId = rs.getString("Module_id");
+                String modName = rs.getString("Module_Name");
+                int mark = rs.getInt("Mark");
+                int credits = rs.getInt("Credits");
+
+                grades.add(new StudentModsGrades(modId, modName, mark, credits));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try { stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+        }
+
+        return grades;
     }
 }
