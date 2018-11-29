@@ -23,7 +23,6 @@ public class AppFrame extends JFrame {
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
-
     }
 
     public void toStudentPanel(User student){
