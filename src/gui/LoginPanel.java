@@ -30,10 +30,8 @@ public class LoginPanel extends JPanel{
                 if (command.equals("Submit")){
                     String username = usernameField.getText();
                     String password = Sha.getSHA(passwordField.getText());
-                    User user = null;
                     try {
-                        System.out.println("hello?");
-                        user = SystemsOperations.getUser(username, password);
+                        User user = SystemsOperations.getUser(username, password);
                         if(user.getRole().equals("Student")){
                             theFrame.toStudentPanel(user);
                         }else if(user.getRole().equals("Administrator")){

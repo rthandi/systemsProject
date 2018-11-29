@@ -19,8 +19,7 @@ public class AddDegreePanel extends JPanel {
             e.printStackTrace();
         }
 
-        JPanel addDegreePanel = new JPanel();
-        setLayout(new BoxLayout(addDegreePanel, BoxLayout.Y_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createTitledBorder("New degree:"));
 
         add(new JLabel("Degree ID:"));
@@ -50,7 +49,6 @@ public class AddDegreePanel extends JPanel {
                         String degName = degreeNameField.getText();
                         Department leadDept = (Department) leadDeptList.getSelectedItem();
                         String deptCode = leadDept.getDepartmentCode();
-
                         SystemsOperations.addDegree(user, degID, degName, deptCode, con);
                     }catch(SQLException e1) {
                         e1.printStackTrace();
