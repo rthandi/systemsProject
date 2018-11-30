@@ -515,41 +515,36 @@ public class SystemsOperations {
      * @return user from given or null if no such user
      * @throws SQLException if error with the database, should still return null
      */
-    public static User getUser(String usernameInput, String hashInput) throws SQLException { //will have password hash if that gets done
-        Connection con = null;
+    public static User getUser(String usernameInput, String hashInput, Connection con) throws SQLException {
+    	Statement stmt = null;
+    	ResultSet rs = null;
         try {
-            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
-            try {
-                Statement stmt = con.createStatement();
-                ResultSet rs;
+            stmt = con.createStatement();
 
-                String query = "SELECT * FROM User " +
-                        "WHERE Username = '" + usernameInput +
-                        "' AND Hash = '" + hashInput +"'";
+            String query = "SELECT * FROM User " +
+                    "WHERE Username = '" + usernameInput +
+                    "' AND Hash = '" + hashInput +"'";
 
-                rs = stmt.executeQuery(query);
+            rs = stmt.executeQuery(query);
 
-                if(rs.next()) {
-                    String username = rs.getString("Username");
-                    String hash = rs.getString("Hash");
-                    String title = rs.getString("Title");
-                    String surname = rs.getString("Surname");
-                    String otherNames = rs.getString("Other_names");
-                    String role = rs.getString("Role");
-                    String email = rs.getString("Email");
-                    return new User(username, hash, title, surname, otherNames, role, email);
-                }else{
-                    return null;
-                }
-            } catch (SQLException e) {
-                e.printStackTrace(System.err);
+            if(rs.next()) {
+                String username = rs.getString("Username");
+                String hash = rs.getString("Hash");
+                String title = rs.getString("Title");
+                String surname = rs.getString("Surname");
+                String otherNames = rs.getString("Other_names");
+                String role = rs.getString("Role");
+                String email = rs.getString("Email");
+                return new User(username, hash, title, surname, otherNames, role, email);
+            }else{
                 return null;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
             return null;
         } finally {
-            if (con != null) con.close();
+        	try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+        	try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
         }
     }
     
