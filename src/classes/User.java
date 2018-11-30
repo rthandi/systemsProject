@@ -464,10 +464,17 @@ public class User {
                     "WHERE Module_id = '" + moduleId + "' AND Username = '" + this.getRegistrationNumber() + "'";
             rs = stmt.executeQuery(query);
             if (rs.next()){
-                //Check if it is a resit or not so we can cap at 40%
-                if (resit && grade > 40){
-                    grade = 40;
-                }
+                //Check if it is a resit or not so we can cap at 40% (year 1-3) and 50% (year 4)
+            	if (this.getLevel() == '4') {
+		            if (resit && grade > 50){
+		                grade = 50;
+		            }
+            	}
+            	else {
+            		if (resit && grade > 40) {
+            			grade = 40;
+            		}
+            	}
                 stmt.close();
                 stmt = con.createStatement();
                 query = "UPDATE Student_Module " +
