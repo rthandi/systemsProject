@@ -67,6 +67,7 @@ public class createTable {
 					 " Degree_id VARCHAR(8) not NULL, " +
 					 " Tutor VARCHAR(50) not NULL, " +
 					 " Level VARCHAR(1) not NULL, " +
+					 " Resit VARCHAR(1) DEFAULT 0," +
 					 " PRIMARY KEY (Username), " +
 					 " CONSTRAINT username" +
 						 " FOREIGN KEY (Username)" +

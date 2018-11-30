@@ -509,7 +509,7 @@ public class SystemsOperations {
     \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
     
     /**
-     * Method to retrieve data about a user from the Database and create a User opject out of it
+     * Method to retrieve data about a user from the Database and create a User object out of it
      * @param usernameInput The username of the user we want to return
      * @param hashInput The hashed password of the user we want to return
      * @return user from given or null if no such user
@@ -552,6 +552,77 @@ public class SystemsOperations {
             if (con != null) con.close();
         }
     }
+    
+    /**
+     * Method to retrieve data about a Student from the Database and create a User object out of it
+     * @param usernameInput The username of the user we want to return
+     * @param hashInput The hashed password of the user we want to return
+     * @return user from given or null if no such user
+     * @throws SQLException if error with the database, should still return null
+     */
+    public static boolean attemptResit (User student, Connection con) throws SQLException {
+		Statement resit = null;
+		Statement stmt = null;
+		Statement stmt2 = null;
+        Statement stmt3 = null;
+        Statement stmt4 = null;
+        ResultSet canResit = null;
+        ResultSet modules = null;
+        ResultSet studentModules = null;
+        ArrayList<String> moduleArray = new ArrayList<>();
+		try {
+			resit = con.createStatement();
+			String resitPoss = "SELECT Resit FROM Student WHERE Username = '" + student.getRegistrationNumber() + "'";
+			canResit = resit.executeQuery(resitPoss);
+			while (canResit.next()) {
+				if (canResit.getString("Resit").equals("")) {
+					stmt = con.createStatement();
+		        	String query = "SELECT Module_id FROM Degree_Module_Approved " +
+		        				   "WHERE Level = '" + student.getLevel() + "' AND Degree_id = '" + student.getDegreeId() + "'";
+		        	modules = stmt.executeQuery(query);
+		        	while (modules.next()) {
+		        		moduleArray.add(modules.getString("Module_id"));
+		        	}
+		        	
+		        	stmt2 = con.createStatement();
+		        	query = "SELECT * FROM Student_Module " +
+		        			"WHERE Username = '" + student.getRegistrationNumber() + "'";
+		        	studentModules = stmt2.executeQuery(query);
+		        	
+		        	stmt3 = con.createStatement();
+		        	while (studentModules.next()) {
+		        		if (moduleArray.contains(studentModules.getString("Module_id"))) {
+		        			query = "UPDATE Student_Module SET Mark = '0' WHERE " +
+								   "Username = '" + student.getRegistrationNumber() + 
+								   "' AND Mark < 40 AND Module_id = '" + studentModules.getString("Module_id") + "'";
+		        			stmt3.executeUpdate(query);
+		        		}
+		        	}
+		        	stmt4 = con.createStatement();
+		        	query = "UPDATE Student SET Resit = '" + student.getLevel() + "' WHERE Username = '" + student.getRegistrationNumber() + "'";
+		        	stmt4.executeUpdate(query);
+		        	return true;
+				}
+				else {
+					return false;
+				}
+			}
+			return false;
+			
+		} catch (SQLException e){
+	        e.printStackTrace(System.err);
+	        return false;
+	    } finally {
+	        try { if (resit != null) resit.close(); } catch (Exception e) {}
+	        try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+	        try { if (stmt2 != null) stmt2.close(); } catch (Exception e) {}
+	        try { if (stmt3 != null) stmt3.close(); } catch (Exception e) {}
+	        try { if (stmt4 != null) stmt4.close(); } catch (Exception e) {}
+	        try { if (canResit != null) canResit.close(); } catch (Exception e) {}
+	        try { if (modules != null) modules.close(); } catch (Exception e) {}
+	        try { if (studentModules != null) studentModules.close(); } catch (Exception e) {}
+	    }
+	}
 
     /**
      * Method to create an ArrayList for storing Degree information
@@ -717,6 +788,67 @@ public class SystemsOperations {
 		return false;
 	}
 	
+	public static boolean attemptResit (User student, Connection con) throws SQLException {
+		Statement resit = null;
+		Statement stmt = null;
+		Statement stmt2 = null;
+        Statement stmt3 = null;
+        Statement stmt4 = null;
+        ResultSet canResit = null;
+        ResultSet modules = null;
+        ResultSet studentModules = null;
+        ArrayList<String> moduleArray = new ArrayList<>();
+		try {
+			resit = con.createStatement();
+			String resitPoss = "SELECT Resit FROM Students WHERE Username = " + student.getRegistrationNumber();
+			canResit = resit.executeQuery(resitPoss);
+			
+			if (canResit.getString("Resit").equals("")) {
+				stmt = con.createStatement();
+	        	String query = "SELECT Module_id FROM Degree_Module_Approved " +
+	        				   "WHERE Level = " + student.getLevel() + " AND Degree_id = " + student.getDegreeId();
+	        	modules = stmt.executeQuery(query);
+	        	while (modules.next()) {
+	        		moduleArray.add(modules.getString("Module_id"));
+	        	}
+	        	
+	        	stmt2 = con.createStatement();
+	        	query = "SELECT * FROM Student_Module " +
+	        			"WHERE Username = " + student.getRegistrationNumber();
+	        	studentModules = stmt2.executeQuery(query);
+	        	
+	        	stmt3 = con.createStatement();
+	        	while (studentModules.next()) {
+	        		if (moduleArray.contains(studentModules.getString("Module_id"))) {
+	        			query = "UPDATE Student_Modules SET Mark = '0' WHERE " +
+							   "Username = " + student.getRegistrationNumber() + " AND Mark < '0' AND Module_id = " + studentModules.getString("Module_id");
+	        			stmt3.executeUpdate(query);
+	        		}
+	        	}
+	        	stmt4 = con.createStatement();
+	        	query = "UPDATE Student SET Resit = " + student.getLevel() +" WHERE Username = " + student.getRegistrationNumber();
+	        	stmt4.executeUpdate(query);
+	        	return true;
+			}
+			
+			
+		} catch (SQLException e){
+	        e.printStackTrace(System.err);
+	        return false;
+	    } finally {
+	        try { if (resit != null) resit.close(); } catch (Exception e) {}
+	        try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+	        try { if (stmt2 != null) stmt2.close(); } catch (Exception e) {}
+	        try { if (stmt3 != null) stmt3.close(); } catch (Exception e) {}
+	        try { if (stmt4 != null) stmt4.close(); } catch (Exception e) {}
+	        try { if (canResit != null) canResit.close(); } catch (Exception e) {}
+	        try { if (modules != null) modules.close(); } catch (Exception e) {}
+	        try { if (studentModules != null) studentModules.close(); } catch (Exception e) {}
+	    }
+		return false;
+		
+	}
+	
 	/**
 	 * Method to progress a Student to the next step of their degree
 	 * @param currentUser The currently logged in user
@@ -740,6 +872,13 @@ public class SystemsOperations {
 				// give the student new compulsory modules
 				if (student.getLevel() != 'P') {
 					giveCompModules(currentUser, student, con);
+				}
+			} else {
+				if (attemptResit(student, con)) {
+					return true;
+				}
+				else {
+					return false;
 				}
 			}
 		} catch (SQLException e){

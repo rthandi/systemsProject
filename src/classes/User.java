@@ -2,6 +2,7 @@ package classes;
 
 import javax.print.DocFlavor;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -93,7 +94,7 @@ public class User {
 
     public String getFullName(){
         return (title + " " + otherNames + " " + surname);
-    }
+    }    
     
     // Setter method
     public String setRole(String newRole) {
@@ -173,7 +174,8 @@ public class User {
             return -1;
         } finally {
             try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
-            try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}		}
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}		
+            }   
     }
 
 
