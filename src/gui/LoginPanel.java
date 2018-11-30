@@ -23,7 +23,6 @@ public class LoginPanel extends JPanel{
         usernameField = new JTextField(10);
         passwordField = new JPasswordField(10);
 
-
         JButton submitButton = new JButton("Submit");
         submitButton.addActionListener(new ActionListener() {
             @Override
@@ -36,6 +35,7 @@ public class LoginPanel extends JPanel{
                     try {
                         con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
                         User user = SystemsOperations.getUser(username, password);
+
                         if(user.getRole().equals("Student")){
                             user.toStudent(con);
                             theFrame.toStudentPanel(user);
@@ -54,7 +54,6 @@ public class LoginPanel extends JPanel{
                 }
             }
         });
-
         add(new JLabel("Username:"));
         add(usernameField);
         add(new JLabel("Password:"));
