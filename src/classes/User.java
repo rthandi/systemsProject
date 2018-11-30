@@ -314,7 +314,7 @@ public class User {
         try {
         	stmt = con.createStatement();
         	String query = "SELECT Module_id FROM Degree_Module_Approved " +
-        				   "WHERE Level = " + inpLevel + " AND Degree_id = " + this.getDegreeId();
+        				   "WHERE Level = " + inpLevel + " AND Degree_id = '" + this.getDegreeId()+"'";
         	modules = stmt.executeQuery(query);
         	while (modules.next()) {
         		moduleArray.add(modules.getString("Module_id"));
@@ -322,7 +322,7 @@ public class User {
         	
         	stmt2 = con.createStatement();
         	query = "SELECT * FROM Student_Module " +
-        			"WHERE Username = " + this.getRegistrationNumber();
+        			"WHERE Username = '" + this.getRegistrationNumber()+"'";
         	studentModules = stmt2.executeQuery(query);
         	
         	while (studentModules.next()) {
@@ -673,7 +673,7 @@ public class User {
         ArrayList<StudentModsGrades> grades = new ArrayList<>();
         try{
             stmt = con.createStatement();
-            String query = "SELECT Module_id, Module_Name, Student_Module.Mark, Credits " +
+            String query = "SELECT Student_Module.Module_id, Module_Name, Student_Module.Mark, Credits " +
                     "FROM Student_Module " +
                     "INNER JOIN Modules " +
                     "ON Student_Module.Module_id = Modules.Module_id " +
