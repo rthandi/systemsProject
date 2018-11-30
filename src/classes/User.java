@@ -503,7 +503,10 @@ public class User {
      */
     public String graduate(Connection con) throws SQLException {
         ResultSet rs = null;
+        ResultSet checkResit = null;
         Statement stmt = null;
+        Statement resit = null;
+        
         try {
             String output;
             char level = this.getLevel();
@@ -579,19 +582,32 @@ public class User {
                     //calculate weighted total grade
                     int total = ((secondYearMark + (thirdYearMark * 2)) / 3);
                     //Calculate degree class
-                    if (total >= 69.5) {
-                        output = "First class";
-                    } else if (total >= 59.5) {
-                        output = "Upper second";
-                    } else if (total >= 49.5) {
-                        output = "Lower second";
-                    } else if (total >= 44.5) {
-                        output = "Third class";
-                    } else if (total >= 39.5) {
-                        output = "Pass (non-honours)";
+                    //If student had to re-sit third year, achieve a pass
+                    resit = con.createStatement();
+                    String query = "SELECT Resit FROM Student WHERE Username = '" + this.getRegistrationNumber() + "'";
+                    checkResit = resit.executeQuery(query);
+                    if (checkResit.next()) {
+                    	if ((checkResit.getInt("Resit") == 3) & (total >= 39.5)){
+                    		output = "Pass (non-honours)";
+                    	} else {
+                    		if (total >= 69.5) {
+                                output = "First class";
+                            } else if (total >= 59.5) {
+                                output = "Upper second";
+                            } else if (total >= 49.5) {
+                                output = "Lower second";
+                            } else if (total >= 44.5) {
+                                output = "Third class";
+                            } else if (total >= 39.5) {
+                                output = "Pass (non-honours)";
+                            } else {
+                                output = "fail";
+                            }
+                    	}
                     } else {
-                        output = "fail";
+                    	output = "fail";
                     }
+                    
                 } else if (level == '4') {
                     int fourthYearMark = this.calculateMeanGrade(con, '4');
                     int total = ((secondYearMark + (thirdYearMark * 2) + (fourthYearMark * 2)) / 5);

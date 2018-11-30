@@ -565,10 +565,10 @@ public class SystemsOperations {
             String query = "SELECT * FROM User " +
                     "WHERE Username = '" + usernameInput +
                     "' AND Hash = '" + hashInput +"'";
-
+            
             rs = stmt.executeQuery(query);
 
-            if(rs.next()) {
+            while (rs.next()) {
                 String username = rs.getString("Username");
                 String hash = rs.getString("Hash");
                 String title = rs.getString("Title");
@@ -589,9 +589,8 @@ public class SystemsOperations {
 	            }else{
 	                return null;
 	            }
-            }else {
-            	return null;
             }
+            return null;
             
         } catch (SQLException e) {
             e.printStackTrace(System.err);
