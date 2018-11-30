@@ -90,11 +90,13 @@ public class selectData {
 	 		        String degreeId = res.getString("Degree_id");
 	 		        String tutor = res.getString("Tutor");
 	 		        String level = res.getString("Level");
+	 		        String resit = res.getString("Resit");
  		            //Display values
 	 		        System.out.print("Username: " + user);
 	 		        System.out.print(", Degree Id: " + degreeId);
 	 		        System.out.print(", Tutor: " + tutor);
-	 		        System.out.println(", Level: " + level);
+	 		        System.out.print(", Level: " + level);
+	 		       System.out.println(", Resit: " + resit);
 	 		    }
 	 		    res.close();
 	 		    
