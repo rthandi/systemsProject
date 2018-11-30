@@ -509,47 +509,98 @@ public class SystemsOperations {
     \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
     
     /**
-     * Method to retrieve data about a user from the Database and create a User opject out of it
+     * Method to retrieve data about a user from the Database and create a User object out of it
      * @param usernameInput The username of the user we want to return
      * @param hashInput The hashed password of the user we want to return
      * @return user from given or null if no such user
      * @throws SQLException if error with the database, should still return null
      */
-    public static User getUser(String usernameInput, String hashInput) throws SQLException { //will have password hash if that gets done
-        Connection con = null;
+    public static User getUser(String usernameInput, String hashInput, Connection con) throws SQLException {
+    	Statement stmt = null;
+    	ResultSet rs = null;
         try {
-            con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
-            try {
-                Statement stmt = con.createStatement();
-                ResultSet rs;
+            stmt = con.createStatement();
 
-                String query = "SELECT * FROM User " +
-                        "WHERE Username = '" + usernameInput +
-                        "' AND Hash = '" + hashInput +"'";
+            String query = "SELECT * FROM User " +
+                    "WHERE Username = '" + usernameInput +
+                    "' AND Hash = '" + hashInput +"'";
 
-                rs = stmt.executeQuery(query);
+            rs = stmt.executeQuery(query);
 
-                if(rs.next()) {
-                    String username = rs.getString("Username");
-                    String hash = rs.getString("Hash");
-                    String title = rs.getString("Title");
-                    String surname = rs.getString("Surname");
-                    String otherNames = rs.getString("Other_names");
-                    String role = rs.getString("Role");
-                    String email = rs.getString("Email");
-                    return new User(username, hash, title, surname, otherNames, role, email);
-                }else{
-                    return null;
-                }
-            } catch (SQLException e) {
-                e.printStackTrace(System.err);
+            if(rs.next()) {
+                String username = rs.getString("Username");
+                String hash = rs.getString("Hash");
+                String title = rs.getString("Title");
+                String surname = rs.getString("Surname");
+                String otherNames = rs.getString("Other_names");
+                String role = rs.getString("Role");
+                String email = rs.getString("Email");
+                return new User(username, hash, title, surname, otherNames, role, email);
+            }else{
                 return null;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
             return null;
         } finally {
-            if (con != null) con.close();
+        	try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+        	try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+        }
+    }
+    
+    /**
+     * Method to retrieve data about a Student from the Database and create a User object out of it
+     * @param usernameInput The username of the user we want to return
+     * @param hashInput The hashed password of the user we want to return
+     * @return user from given or null if no such user
+     * @throws SQLException if error with the database, should still return null
+     */
+    public static User getStudent(String usernameInput, String hashInput, Connection con) throws SQLException {
+    	Statement stmt = null;
+    	Statement stmt2 = null;
+    	ResultSet rs = null;
+    	ResultSet rs2 = null;
+        try {
+            stmt = con.createStatement();
+            String query = "SELECT * FROM User " +
+                    "WHERE Username = '" + usernameInput +
+                    "' AND Hash = '" + hashInput +"'";
+
+            rs = stmt.executeQuery(query);
+
+            if(rs.next()) {
+                String username = rs.getString("Username");
+                String hash = rs.getString("Hash");
+                String title = rs.getString("Title");
+                String surname = rs.getString("Surname");
+                String otherNames = rs.getString("Other_names");
+                String role = rs.getString("Role");
+                String email = rs.getString("Email");
+                stmt2 = con.createStatement();
+	            query = "SELECT * FROM Student " +
+	                    "WHERE Username = '" + usernameInput + "'";
+	            rs2 = stmt2.executeQuery(query);
+	
+	            if(rs2.next()) {
+	 		        String degreeId = rs2.getString("Degree_id");
+	 		        String tutor = rs2.getString("Tutor");
+	 		        char level = rs2.getString("Level").charAt(0);
+	 		        return new User(username, hash, title, surname, otherNames, role, degreeId, email, tutor, level);
+	            }else{
+	                return null;
+	            }
+            }else {
+            	return null;
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+            return null;
+        } finally {
+        	 try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+        	 try { if (stmt2 != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+        	 try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
+        	 try { if (rs2 != null) rs2.close(); } catch (Exception e) {e.printStackTrace(System.err);}
         }
     }
 
@@ -718,6 +769,78 @@ public class SystemsOperations {
 	}
 	
 	/**
+	 * Check to see if a student is allowed to resit the year
+	 * @param student The student who failed the year
+	 * @param con The currently open connection to the database
+	 * @return True if successful, false if an error was encountered
+	 * @throws SQLException Throws and prints the error if there is an issue with the database
+	 */
+	public static boolean attemptResit (User student, Connection con) throws SQLException {
+		Statement resit = null;
+		Statement stmt = null;
+		Statement stmt2 = null;
+        Statement stmt3 = null;
+        Statement stmt4 = null;
+        ResultSet canResit = null;
+        ResultSet modules = null;
+        ResultSet studentModules = null;
+        ArrayList<String> moduleArray = new ArrayList<>();
+		try {
+			resit = con.createStatement();
+			String resitPoss = "SELECT Resit FROM Student WHERE Username = '" + student.getRegistrationNumber() + "'";
+			canResit = resit.executeQuery(resitPoss);
+			while (canResit.next()) {
+				if (canResit.getString("Resit").equals("")) {
+					stmt = con.createStatement();
+		        	String query = "SELECT Module_id FROM Degree_Module_Approved " +
+		        				   "WHERE Level = '" + student.getLevel() + "' AND Degree_id = '" + student.getDegreeId() + "'";
+		        	modules = stmt.executeQuery(query);
+		        	while (modules.next()) {
+		        		moduleArray.add(modules.getString("Module_id"));
+		        	}
+		        	
+		        	stmt2 = con.createStatement();
+		        	query = "SELECT * FROM Student_Module " +
+		        			"WHERE Username = '" + student.getRegistrationNumber() + "'";
+		        	studentModules = stmt2.executeQuery(query);
+		        	
+		        	stmt3 = con.createStatement();
+		        	while (studentModules.next()) {
+		        		if (moduleArray.contains(studentModules.getString("Module_id"))) {
+		        			query = "UPDATE Student_Module SET Mark = '0' WHERE " +
+								   "Username = '" + student.getRegistrationNumber() + 
+								   "' AND Mark < 40 AND Module_id = '" + studentModules.getString("Module_id") + "'";
+		        			stmt3.executeUpdate(query);
+		        		}
+		        	}
+		        	stmt4 = con.createStatement();
+		        	query = "UPDATE Student SET Resit = '" + student.getLevel() + "' WHERE Username = '" + student.getRegistrationNumber() + "'";
+		        	stmt4.executeUpdate(query);
+		        	return true;
+				}
+				else {
+					return false;
+				}
+			}
+			return false;
+			
+		} catch (SQLException e){
+	        e.printStackTrace(System.err);
+	        return false;
+	    } finally {
+	        try { if (resit != null) resit.close(); } catch (Exception e) {}
+	        try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+	        try { if (stmt2 != null) stmt2.close(); } catch (Exception e) {}
+	        try { if (stmt3 != null) stmt3.close(); } catch (Exception e) {}
+	        try { if (stmt4 != null) stmt4.close(); } catch (Exception e) {}
+	        try { if (canResit != null) canResit.close(); } catch (Exception e) {}
+	        try { if (modules != null) modules.close(); } catch (Exception e) {}
+	        try { if (studentModules != null) studentModules.close(); } catch (Exception e) {}
+	    }
+		
+	}
+	
+	/**
 	 * Method to progress a Student to the next step of their degree
 	 * @param currentUser The currently logged in user
 	 * @param student The student that we want to progress to the next step in their degree
@@ -740,6 +863,13 @@ public class SystemsOperations {
 				// give the student new compulsory modules
 				if (student.getLevel() != 'P') {
 					giveCompModules(currentUser, student, con);
+				}
+			} else {
+				if (attemptResit(student, con)) {
+					return true;
+				}
+				else {
+					return false;
 				}
 			}
 		} catch (SQLException e){
