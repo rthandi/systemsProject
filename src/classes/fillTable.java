@@ -74,7 +74,7 @@ public class fillTable {
 			    System.out.println("--- Populating User table");
 				  
 			    sql = "INSERT INTO User " +
-		              "VALUES ('aca17ab', 'hashsash', 'Mr', 'Bobby', 'Aegar', 'Student', 'ABobby1@uni.ac.uk')";
+		              "VALUES ('aca17ab', '"+Sha.getSHA("hash") +"', 'Mr', 'Bobby', 'Aegar', 'Student', 'ABobby1@uni.ac.uk')";
 			    stmt.executeUpdate(sql);
 			    
 			    
