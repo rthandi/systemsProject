@@ -8,7 +8,7 @@ import java.sql.*;
 public class AddStudentPanel extends JPanel {
 	public AddStudentPanel(User user) {
 		JPanel addStudentPanel = new JPanel();
-		setLayout(new BoxLayout(addStudentPanel, BoxLayout.Y_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createTitledBorder("New Student:"));
 		
 		add(new JLabel("Username:"));

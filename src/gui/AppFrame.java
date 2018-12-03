@@ -23,7 +23,6 @@ public class AppFrame extends JFrame {
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
-
     }
 
     public void toStudentPanel(User student){
@@ -49,7 +48,7 @@ public class AppFrame extends JFrame {
     public void toRegistrarPanel(User registrar) throws SQLException {
     	Container contentPane = getContentPane();
     	contentPane.removeAll();
-    	
+
     	contentPane.add(new RegistrarPanel(this,registrar));
     	
     	contentPane.revalidate();
@@ -59,7 +58,7 @@ public class AppFrame extends JFrame {
     public void toTeacherPanel(User teacher) throws SQLException {
     	Container contentPane = getContentPane();
     	contentPane.removeAll();
-    	
+
     	contentPane.add(new TeacherPanel(this, teacher));
     	
     	contentPane.revalidate();

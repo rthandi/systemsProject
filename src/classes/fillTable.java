@@ -74,14 +74,14 @@ public class fillTable {
 			    System.out.println("--- Populating User table");
 				  
 			    sql = "INSERT INTO User " +
-		              "VALUES ('aca17ab', 'hashsash', 'Mr', 'Bobby', 'Aegar', 'Student', 'ABobby1@uni.ac.uk')";
+		              "VALUES ('aca17ab', '"+Sha.getSHA("hash") +"', 'Mr', 'Bobby', 'Aegar', 'Student', 'ABobby1@uni.ac.uk')";
 			    stmt.executeUpdate(sql);
 			    
 			    
 			    System.out.println("--- Populating Student table");
 				  
 			    sql = "INSERT INTO Student " +
-		              "VALUES ('aca17ab', 'COMU01', 'McMe', '1')";
+		              "VALUES ('aca17ab', 'COMU01', 'McMe', '1', '')";
 			    stmt.executeUpdate(sql);
 			      
 			      
@@ -94,7 +94,7 @@ public class fillTable {
 		              "VALUES ('aca17ab', 'COM1002', 61)";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Student_Module " +
-		              "VALUES ('aca17ab', 'COM1006', 69)";
+		              "VALUES ('aca17ab', 'COM1006', 39)";
 			    stmt.executeUpdate(sql);
 			      
 			      

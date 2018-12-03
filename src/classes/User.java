@@ -1,7 +1,9 @@
 package classes;
 
 import javax.print.DocFlavor;
+
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -49,6 +51,10 @@ public class User {
         role = roleInput;
         email = emailInput;
 
+        degreeId = null;
+        tutorName = null;
+        level = ' ';
+
     }
     /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     \\\\\\\\\\\\\\\GETTING METHODS\\\\\\\\\\\\\\\
@@ -93,16 +99,30 @@ public class User {
 
     public String getFullName(){
         return (title + " " + otherNames + " " + surname);
-    }
+    }    
     
     // Setter method
     public String setRole(String newRole) {
     	role = newRole;
     	return role;
     }
-    
-    
-    // Other
+
+
+    /* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\SETTER METHODS\\\\\\\\\\\\\\\
+    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
+    public void setDegreeId(String degId){
+        degreeId = degId;
+    }
+
+    public void setTutor(String tutorNameInput){
+        tutorName = tutorNameInput;
+    }
+
+    public void setLevel(char levelInput){
+        level = levelInput;
+    }
+
     /**
      * Method to increase the level of a student
      * @return increased student level
@@ -173,8 +193,10 @@ public class User {
             return -1;
         } finally {
             try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
-            try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}		}
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}		
+            }   
     }
+
 
 
     /**
@@ -305,7 +327,7 @@ public class User {
         try {
         	stmt = con.createStatement();
         	String query = "SELECT Module_id FROM Degree_Module_Approved " +
-        				   "WHERE Level = " + inpLevel + " AND Degree_id = " + this.getDegreeId();
+        				   "WHERE Level = " + inpLevel + " AND Degree_id = '" + this.getDegreeId()+"'";
         	modules = stmt.executeQuery(query);
         	while (modules.next()) {
         		moduleArray.add(modules.getString("Module_id"));
@@ -313,7 +335,7 @@ public class User {
         	
         	stmt2 = con.createStatement();
         	query = "SELECT * FROM Student_Module " +
-        			"WHERE Username = " + this.getRegistrationNumber();
+        			"WHERE Username = '" + this.getRegistrationNumber()+"'";
         	studentModules = stmt2.executeQuery(query);
         	
         	while (studentModules.next()) {
@@ -464,10 +486,17 @@ public class User {
                     "WHERE Module_id = '" + moduleId + "' AND Username = '" + this.getRegistrationNumber() + "'";
             rs = stmt.executeQuery(query);
             if (rs.next()){
-                //Check if it is a resit or not so we can cap at 40%
-                if (resit && grade > 40){
-                    grade = 40;
-                }
+                //Check if it is a resit or not so we can cap at 40% (year 1-3) and 50% (year 4)
+            	if (this.getLevel() == '4') {
+		            if (resit && grade > 50){
+		                grade = 50;
+		            }
+            	}
+            	else {
+            		if (resit && grade > 40) {
+            			grade = 40;
+            		}
+            	}
                 stmt.close();
                 stmt = con.createStatement();
                 query = "UPDATE Student_Module " +
@@ -494,7 +523,10 @@ public class User {
      */
     public String graduate(Connection con) throws SQLException {
         ResultSet rs = null;
+        ResultSet checkResit = null;
         Statement stmt = null;
+        Statement resit = null;
+        
         try {
             String output;
             char level = this.getLevel();
@@ -570,19 +602,32 @@ public class User {
                     //calculate weighted total grade
                     int total = ((secondYearMark + (thirdYearMark * 2)) / 3);
                     //Calculate degree class
-                    if (total >= 69.5) {
-                        output = "First class";
-                    } else if (total >= 59.5) {
-                        output = "Upper second";
-                    } else if (total >= 49.5) {
-                        output = "Lower second";
-                    } else if (total >= 44.5) {
-                        output = "Third class";
-                    } else if (total >= 39.5) {
-                        output = "Pass (non-honours)";
+                    //If student had to re-sit third year, achieve a pass
+                    resit = con.createStatement();
+                    String query = "SELECT Resit FROM Student WHERE Username = '" + this.getRegistrationNumber() + "'";
+                    checkResit = resit.executeQuery(query);
+                    if (checkResit.next()) {
+                    	if ((checkResit.getInt("Resit") == 3) & (total >= 39.5)){
+                    		output = "Pass (non-honours)";
+                    	} else {
+                    		if (total >= 69.5) {
+                                output = "First class";
+                            } else if (total >= 59.5) {
+                                output = "Upper second";
+                            } else if (total >= 49.5) {
+                                output = "Lower second";
+                            } else if (total >= 44.5) {
+                                output = "Third class";
+                            } else if (total >= 39.5) {
+                                output = "Pass (non-honours)";
+                            } else {
+                                output = "fail";
+                            }
+                    	}
                     } else {
-                        output = "fail";
+                    	output = "fail";
                     }
+                    
                 } else if (level == '4') {
                     int fourthYearMark = this.calculateMeanGrade(con, '4');
                     int total = ((secondYearMark + (thirdYearMark * 2) + (fourthYearMark * 2)) / 5);
@@ -624,5 +669,68 @@ public class User {
         try { if (rs != null) rs.close(); } catch (Exception e) {e.printStackTrace(System.err);}
         try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
         }
+    }
+
+    /**
+     * Makes a user into a student if it is possible, if not nothing changes
+     * @return student version of the user
+     */
+    public void toStudent(Connection con) throws SQLException{
+        Statement stmt = null;
+        ResultSet rs = null;
+        try{
+            stmt = con.createStatement();
+            String query = "SELECT * FROM Student" +
+                    " WHERE Username = '" + getRegistrationNumber()+"'";
+            rs = stmt.executeQuery(query);
+            while(rs.next()){
+                String degreeId = rs.getString("Degree_id");
+                String tutor = rs.getString("Tutor");
+                char level = rs.getString("Level").charAt(0);
+
+                setDegreeId(degreeId);
+                setTutor(tutor);
+                setLevel(level);
+            }
+        } catch (SQLException e){
+            e.printStackTrace(System.err);
+        } finally {
+            if (stmt != null) stmt.close();
+            if (rs != null) rs.close();
+        }
+    }
+
+    /**
+     *
+     */
+    public ArrayList<StudentModsGrades> getGrades(Connection con){
+        Statement stmt = null;
+        ResultSet rs = null;
+        ArrayList<StudentModsGrades> grades = new ArrayList<>();
+        try{
+            stmt = con.createStatement();
+            String query = "SELECT Student_Module.Module_id, Module_Name, Student_Module.Mark, Credits " +
+                    "FROM Student_Module " +
+                    "INNER JOIN Modules " +
+                    "ON Student_Module.Module_id = Modules.Module_id " +
+                    "WHERE Student_Module.Username = '" + this.getRegistrationNumber() + "'";
+            rs = stmt.executeQuery(query);
+
+            while(rs.next()){
+                String modId = rs.getString("Module_id");
+                String modName = rs.getString("Module_Name");
+                int mark = rs.getInt("Mark");
+                int credits = rs.getInt("Credits");
+
+                grades.add(new StudentModsGrades(modId, modName, mark, credits));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try { stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+        }
+
+        return grades;
     }
 }
