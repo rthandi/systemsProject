@@ -515,6 +515,8 @@ public class SystemsOperations {
      * @return user from given or null if no such user
      * @throws SQLException if error with the database, should still return null
      */
+
+
     public static User getUser(String usernameInput, String hashInput, Connection con) throws SQLException {
     	Statement stmt = null;
     	ResultSet rs = null;
@@ -541,6 +543,7 @@ public class SystemsOperations {
             }
         } catch (SQLException e) {
             e.printStackTrace(System.err);
+
             return null;
         } finally {
         	try { if (stmt != null) stmt.close(); } catch (Exception e) {e.printStackTrace(System.err);}
