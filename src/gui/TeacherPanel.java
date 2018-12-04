@@ -7,7 +7,7 @@ public class TeacherPanel extends JTabbedPane {
 	public TeacherPanel(AppFrame appFrame, User user) throws SQLException {
 		setBorder(BorderFactory.createTitledBorder("Welcome Teacher"));
 		// THESE MAY CHANGE
-		addTab("Update Grades", new(UpdateGradesPanel));
+		add("Update Grades", new UpdateGradesPanel(user));
 	}
 
 }

@@ -3,9 +3,7 @@ import classes.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 import javax.swing.*;
 
@@ -30,6 +28,7 @@ public class DropModuleFromStudentPanel extends JPanel {
 				String command = e.getActionCommand();
 				if (command.equals("add module")) {
 					Connection con = null;
+					ResultSet rs = null;
 					try {
 						con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
 						String username = usernameField.getText();
@@ -38,15 +37,15 @@ public class DropModuleFromStudentPanel extends JPanel {
 						String query = "SELECT Hash FROM User " +
 								"WHERE Username = '" + username + "'";
 						rs = stmt.executeQuery(query);
-						while(rs.next){
+						if(rs.next()){
 							String userHash = rs.getString("Hash");
+							String moduleId = modIdField.getText();
+
+							User student = SystemsOperations.getUser(username, userHash, con);
+							SystemsOperations.deleteStudentModule(user, student, moduleId, con);
+						} else{
+							System.out.println("No such user.");
 						}
-
-						String moduleId = modIdField.getText();
-
-						User student = getUser(username, userHash, con);
-						SystemsOperations.deleteStudentModule(user, student, moduleId, con);
-
 					} catch (SQLException e1) {
 						e1.printStackTrace();
 					} finally {
