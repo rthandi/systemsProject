@@ -15,7 +15,7 @@ public class AddUserPanel extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createTitledBorder("New user"));
 
-        add(new JLabel("Dsername"));
+        add(new JLabel("Username"));
         JTextField usernameField = new JTextField(8);
         add(usernameField);
 
