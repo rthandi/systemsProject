@@ -81,7 +81,7 @@ public class fillTable {
 			    System.out.println("--- Populating Student table");
 				  
 			    sql = "INSERT INTO Student " +
-		              "VALUES ('aca17ab', 'COMU01', 'McMe', '1', '')";
+		              "VALUES ('aca17ab', 'COMU01', 'McMe', '1', DEFAULT)";
 			    stmt.executeUpdate(sql);
 			      
 			      

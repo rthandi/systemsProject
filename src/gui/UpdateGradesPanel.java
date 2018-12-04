@@ -11,8 +11,7 @@ import javax.swing.*;
 
 public class UpdateGradesPanel extends JPanel {
 	public UpdateGradesPanel(User user) {
-		JPanel updateGradesPanel = new JPanel();
-		setLayout(new BoxLayout(updateGradesPanel, BoxLayout.Y_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createTitledBorder("Update Grades:"));
 		
 		add(new JLabel("Username:"));

@@ -36,7 +36,7 @@ public class AddUserPanel extends JPanel {
         add(othernamesField);
 
         add(new JLabel("Role"));
-        String[] roles = {"Student", "Teacher", "Registrar", "Administrator"}
+        String[] roles = {"Student", "Teacher", "Registrar", "Administrator"};
         JComboBox roleList = new JComboBox(roles);
         add(roleList);
 
@@ -60,10 +60,10 @@ public class AddUserPanel extends JPanel {
                         String title = titleField.getText();
                         String surname = surnameField.getText();
                         String othernames = othernamesField.getText();
-                        String role = roleList.getSelectedItem();
+                        String role = (String) roleList.getSelectedItem();
                         String email = emailField.getText();
                         User newUser = new User(username,hash,title,surname,othernames,role,email);
-                        SystemOperations.addUser(currentUser, newUser, con);
+                        SystemsOperations.addUser(currentUser, newUser, con);
                     }catch(SQLException e1) {
                         e1.printStackTrace();
                     }finally{
