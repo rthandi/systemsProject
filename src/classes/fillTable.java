@@ -36,7 +36,7 @@ public class fillTable {
 		              "VALUES ('COM1002', 'Foundations of Computer Science', 20)";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Modules " +
-		              "VALUES ('COM1006', 'Devices and Dirk', 20)";
+		              "VALUES ('COM1006', 'Devices and Networks', 20)";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Modules " +
 		              "VALUES ('COM2004', 'Data Driven Computing', 20)";
@@ -55,16 +55,13 @@ public class fillTable {
 			    System.out.println("--- Populating Degree table");
 				  
 			    sql = "INSERT INTO Degree " +
-		              "VALUES ('COMU01', 'BSc Computer Science', 'COM')";
-			    stmt.executeUpdate(sql);
-			    sql = "INSERT INTO Degree " +
-		              "VALUES ('COMU11', 'BSc Computer Science with a Year in Industry', 'COM')";
+		              "VALUES ('COMU01', 'BSc Information Systems', 'COM')";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Degree " +
 		              "VALUES ('COMP12', 'MEng Software Engineering with a Year in Industry', 'COM')";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Degree " +
-		              "VALUES ('BUSU01', 'BSc in Business Administration', 'BUS')";
+		              "VALUES ('PSYP01', 'MPsy Cognitive Science', 'PSY')";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Degree " +
 		              "VALUES ('BUSP01', 'MSc in Business Administration', 'BUS')";
@@ -72,30 +69,24 @@ public class fillTable {
 			      
 			    
 			    System.out.println("--- Populating User table");
-				  
 			    sql = "INSERT INTO User " +
-		              "VALUES ('aca17ab', '"+Sha.getSHA("hash") +"', 'Mr', 'Bobby', 'Aegar', 'Student', 'ABobby1@uni.ac.uk')";
+			           "VALUES ('aaa18aa', '"+Sha.getSHA("hash") +"', 'Mr', 'Callum', 'Neenan', 'Administrator', 'cneen@uni.ac.uk')";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO User " +
+			           "VALUES ('bbb18bb', '"+Sha.getSHA("hash") +"', 'Mr', 'Robbie', 'Thandie', 'Registrar', 'rthan@uni.ac.uk')";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO User " +
+			           "VALUES ('ccc18cc', '"+Sha.getSHA("hash") +"', 'Mr', 'Seth', 'Faulkner', 'Teacher', 'sfaul@uni.ac.uk')";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO User " +
+			           "VALUES ('ddd18dd', '"+Sha.getSHA("hash") +"', 'Mr', 'Isaac', 'Hill', 'Student', 'cneen@uni.ac.uk')";
 			    stmt.executeUpdate(sql);
 			    
 			    
 			    System.out.println("--- Populating Student table");
-				  
-			    sql = "INSERT INTO Student " +
-		              "VALUES ('aca17ab', 'COMU01', 'McMe', '1', '')";
-			    stmt.executeUpdate(sql);
 			      
 			      
 			    System.out.println("--- Populating Student Module table");
-				
-			    sql = "INSERT INTO Student_Module " +
-		              "VALUES ('aca17ab', 'COM1001', 60)";
-			    stmt.executeUpdate(sql);
-			    sql = "INSERT INTO Student_Module " +
-		              "VALUES ('aca17ab', 'COM1002', 61)";
-			    stmt.executeUpdate(sql);
-			    sql = "INSERT INTO Student_Module " +
-		              "VALUES ('aca17ab', 'COM1006', 39)";
-			    stmt.executeUpdate(sql);
 			      
 			      
 			    System.out.println("--- Populating Degree_Module_Approved table");
@@ -114,9 +105,6 @@ public class fillTable {
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Degree_Module_Approved " +
 		              "VALUES ('COMU01', 2, 'COM2008', True)";
-			    stmt.executeUpdate(sql);
-			    sql = "INSERT INTO Degree_Module_Approved " +
-		              "VALUES ('COMU11', 'P', 'COMP000', True)";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Degree_Module_Approved " +
 		              "VALUES ('BUSP01', 4, 'BUS4001', True)";
