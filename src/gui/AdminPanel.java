@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 public class AdminPanel extends JTabbedPane{
     public AdminPanel(AppFrame appFrame, User user) throws SQLException {
+        setBorder(BorderFactory.createTitledBorder("Welcome Admin"));
         addTab("Add Department", new AddDepartmentPanel(user));
         addTab("Delete Department", new DeleteDepartmentPanel(user));
         addTab("Add Degree", new AddDegreePanel(user));
