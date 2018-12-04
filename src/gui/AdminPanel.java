@@ -22,8 +22,7 @@ public class AdminPanel extends JTabbedPane{
         addTab("Add module to Degree", new ModuleDegreePanel(user));
         addTab("Delete Module", new DeleteModulePanel(user));
         addTab("Delete Module from Degree", new RemoveModuleFromDegree(user));
+        addTab("Add new user", new AddUserPanel(user));
         //TODO creating a user (should be callable on a list or something so admin doesn't have to manually make 100+ students
-        //TODO Delete Module and delete module connection
-
     }
 }
