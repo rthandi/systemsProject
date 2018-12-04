@@ -6,9 +6,16 @@ public class StudentModsGrades {
     int studentsMarks;
     int moduleCredits;
 
-    StudentModsGrades(String modId, String modName, int mark, int credits){
+    public StudentModsGrades(String modId, String modName, int mark, int credits){
         moduleID = modId;
         moduleName = modName;
+        studentsMarks = mark;
+        moduleCredits = credits;
+    }
+
+    public StudentModsGrades(int mark, int credits){
+        moduleID = null;
+        moduleName = null;
         studentsMarks = mark;
         moduleCredits = credits;
     }

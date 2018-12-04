@@ -541,13 +541,13 @@ public class User {
                         "WHERE Student_Module.Username = '" + this.getRegistrationNumber() + "'";
                 rs = stmt.executeQuery(query);
                 boolean passedDissertation = true;
-                ArrayList<Grade> gradeList = new ArrayList<>();
+                ArrayList<StudentModsGrades> gradeList = new ArrayList<>();
                 while (rs.next()){
                     if (rs.getInt("Credits") == 60){
                         if(rs.getInt("Mark") <= 49.5){
                             passedDissertation = false;
                         } else {
-                            gradeList.add(new Grade(rs.getInt("Mark"), rs.getInt("Credits")));
+                            gradeList.add(new StudentModsGrades(rs.getInt("Mark"), rs.getInt("Credits")));
                         }
                     }
                 }
@@ -555,12 +555,12 @@ public class User {
                     //dissertation failed. Check to see if they qualify for a PGDip
                     int amountOfCreditsPassed = 0;
                     boolean concededUsed = false;
-                    for (Grade aGradeList : gradeList) {
-                        if (aGradeList.getGrade() >= 49.5) {
+                    for (StudentModsGrades aGradeList : gradeList) {
+                        if (aGradeList.getStudentsMarks() >= 49.5) {
                             //Module passed add credits to total
-                            amountOfCreditsPassed += aGradeList.getCredits();
-                        } else if (!concededUsed && aGradeList.getGrade()>= 39.5){
-                            amountOfCreditsPassed += aGradeList.getCredits();
+                            amountOfCreditsPassed += aGradeList.getModuleCredits();
+                        } else if (!concededUsed && aGradeList.getStudentsMarks()>= 39.5){
+                            amountOfCreditsPassed += aGradeList.getModuleCredits();
                             concededUsed = true;
                         }
                     }
@@ -581,10 +581,10 @@ public class User {
                     } else {
                         //Failed, check for PGCert
                         int amountOfCreditsPassed = 0;
-                        for (Grade aGradeList : gradeList) {
-                            if (aGradeList.getGrade() >= 49.5) {
+                        for (StudentModsGrades aGradeList : gradeList) {
+                            if (aGradeList.getStudentsMarks() >= 49.5) {
                                 //Module passed add credits to total
-                                amountOfCreditsPassed += aGradeList.getCredits();
+                                amountOfCreditsPassed += aGradeList.getModuleCredits();
                             }
                         }
                         if (amountOfCreditsPassed >= 60) {
