@@ -34,7 +34,7 @@ public class LoginPanel extends JPanel{
                     String password = Sha.getSHA(passwordField.getText());
                     try {
                         con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
-                        User user = SystemsOperations.getUser(username, password);
+                        User user = SystemsOperations.getUser(username, password, con);
 
                         if(user.getRole().equals("Student")){
                             user.toStudent(con);
