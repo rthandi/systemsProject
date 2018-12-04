@@ -11,16 +11,42 @@ import javax.swing.*;
 
 public class DropModuleFromStudentPanel extends JPanel {
 	public DropModuleFromStudentPanel(User user) {
-		JButton xButton = new JButton("");
-		xButton.setActionCommand("");
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setBorder(BorderFactory.createTitledBorder("Add module"));
+
+		add(new JLabel("Username:"));
+		JTextField usernameField = new JTextField(8);
+		add(usernameField);
+
+		add(new JLabel("Module ID:"));
+		JTextField modIdField = new JTextField(6);
+		add(modIdField);
+
+		JButton xButton = new JButton("Submit");
+		xButton.setActionCommand("add module");
 		xButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String command = e.getActionCommand();
-				if (command.equals("add student")) {
+				if (command.equals("add module")) {
 					Connection con = null;
 					try {
 						con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
+						String username = usernameField.getText();
+
+						Statement stmt = con.createStatement();
+						String query = "SELECT Hash FROM User " +
+								"WHERE Username = '" + username + "'";
+						rs = stmt.executeQuery(query);
+						while(rs.next){
+							String userHash = rs.getString("Hash");
+						}
+
+						String moduleId = modIdField.getText();
+
+						User student = getUser(username, userHash, con);
+						SystemsOperations.deleteStudentModule(user, student, moduleId, con);
+
 					} catch (SQLException e1) {
 						e1.printStackTrace();
 					} finally {
@@ -34,7 +60,8 @@ public class DropModuleFromStudentPanel extends JPanel {
 					}
 				}
 			}
-		});	
+		});
+		add(xButton);
 	}
 
 }
