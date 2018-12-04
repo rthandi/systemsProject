@@ -1,10 +1,8 @@
 package gui;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 
 import classes.*;
-import com.sun.xml.internal.messaging.saaj.soap.JpegDataContentHandler;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;

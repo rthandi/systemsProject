@@ -1,12 +1,9 @@
 package gui;
 
-import javax.sound.sampled.BooleanControl;
 import javax.swing.*;
 import java.awt.*;
 import classes.*;
-import com.sun.xml.internal.messaging.saaj.soap.JpegDataContentHandler;
 
-import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
