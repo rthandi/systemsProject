@@ -5,6 +5,7 @@ import java.sql.*;
 
 public class RegistrarPanel extends JTabbedPane {
 	public RegistrarPanel(AppFrame appFrame, User user) throws SQLException {
+		setBorder(BorderFactory.createTitledBorder("Welcome Registrar"));
 		//THESE MAY CHANGE 
 		addTab("Add Student", new AddStudentPanel(user));
 		addTab("Remove Student", new RemoveStudentPanel(user));
