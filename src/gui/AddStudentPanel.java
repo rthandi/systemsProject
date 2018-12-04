@@ -30,7 +30,7 @@ public class AddStudentPanel extends JPanel {
 		JTextField otherNamesField = new JTextField(20);
 		add(otherNamesField);
 		
-		add(new JLabel("Email:"));
+		add(new JLabel("Degree ID:"));
 		JTextField degreeIdField = new JTextField(20);
 		add(degreeIdField);
 		
