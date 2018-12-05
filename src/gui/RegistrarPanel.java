@@ -11,7 +11,7 @@ public class RegistrarPanel extends JTabbedPane {
 		addTab("Remove Student", new RemoveStudentPanel(user));
 		addTab("Add Module To Student", new AddModuleToStudentPanel(user, appFrame));
 		addTab("Drop Module From Student", new DropModuleFromStudentPanel(user));
-		addTab("Check Student Registrations", new  CheckRegistrationsPanel(user));
+		addTab("Check Student Registrations", new  CheckRegistrationsPanel(appFrame, user));
 	}
 
 }
