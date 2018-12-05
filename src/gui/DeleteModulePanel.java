@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class DeleteModulePanel extends JPanel {
     //protected String moduleToDelete = "COM1006";
 
-    public DeleteModulePanel(User user){
+    public DeleteModulePanel(User user, AppFrame appFrame){
         Connection con = null;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -42,6 +42,7 @@ public class DeleteModulePanel extends JPanel {
                         if (modIds.contains(chosenModule)) {
                             try {
                                 SystemsOperations.deleteModule(user, chosenModule, finalCon);
+                                JOptionPane.showMessageDialog(appFrame, "Module Deleted");
                             } catch (SQLException e1) {
                                 e1.printStackTrace();
                             } finally {

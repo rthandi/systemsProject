@@ -14,7 +14,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 
 public class AddNewModule extends JPanel {
-    public AddNewModule(User user){
+    public AddNewModule(User user, AppFrame appFrame){
         ArrayList<Degree> degrees = null;
         try {
             degrees = SystemsOperations.getDegrees();
@@ -89,6 +89,7 @@ public class AddNewModule extends JPanel {
                         }
                         try {
                             SystemsOperations.addModule(user, moduleId, moduleName, credits, level, compulsory, degreeId, con);
+                            JOptionPane.showMessageDialog(appFrame, "The degree is added!");
                         } catch (SQLException e1) {
                             e1.printStackTrace();
                         }

@@ -15,16 +15,16 @@ import java.util.ArrayList;
 public class AdminPanel extends JTabbedPane{
     public AdminPanel(AppFrame appFrame, User user) throws SQLException {
         setBorder(BorderFactory.createTitledBorder("Welcome Admin"));
-        addTab("Add Department", new AddDepartmentPanel(user));
-        addTab("Delete Department", new DeleteDepartmentPanel(user));
-        addTab("Add Degree", new AddDegreePanel(user));
-        addTab("Delete Degree", new DeleteDegreePanel(user));
-        addTab("Add new Module", new AddNewModule(user));
-        addTab("Add module to Degree", new ModuleDegreePanel(user));
-        addTab("Delete Module", new DeleteModulePanel(user));
-        addTab("Delete Module from Degree", new RemoveModuleFromDegree(user));
-        addTab("Add New user", new AddUserPanel(user));
-        addTab("Remove User", new RemoveUserPanel(user));
+        addTab("Add Department", new AddDepartmentPanel(user, appFrame));
+        addTab("Delete Department", new DeleteDepartmentPanel(user, appFrame));
+        addTab("Add Degree", new AddDegreePanel(user, appFrame));
+        addTab("Delete Degree", new DeleteDegreePanel(user, appFrame));
+        addTab("Add new Module", new AddNewModule(user, appFrame));
+        addTab("Add module to Degree", new ModuleDegreePanel(user, appFrame));
+        addTab("Delete Module", new DeleteModulePanel(user, appFrame));
+        addTab("Delete Module from Degree", new RemoveModuleFromDegree(user, appFrame));
+        addTab("Add New user", new AddUserPanel(user, appFrame));
+        addTab("Remove User", new RemoveUserPanel(user, appFrame));
         //TODO creating a user (should be callable on a list or something so admin doesn't have to manually make 100+ students
     }
 }

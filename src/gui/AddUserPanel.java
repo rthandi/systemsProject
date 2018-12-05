@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class AddUserPanel extends JPanel {
-    public AddUserPanel(User currentUser){
+    public AddUserPanel(User currentUser, AppFrame appFrame){
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createTitledBorder("New user"));
 
@@ -64,6 +64,7 @@ public class AddUserPanel extends JPanel {
                         String email = emailField.getText();
                         User newUser = new User(username,hash,title,surname,othernames,role,email);
                         SystemsOperations.addUser(currentUser, newUser, con);
+                        JOptionPane.showMessageDialog(appFrame, "User added");
                     }catch(SQLException e1) {
                         e1.printStackTrace();
                     }finally{

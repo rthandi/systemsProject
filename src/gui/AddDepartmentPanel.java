@@ -3,6 +3,7 @@ package gui;
 import classes.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -10,7 +11,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class AddDepartmentPanel extends JPanel{
-    public AddDepartmentPanel(User user){
+    public AddDepartmentPanel(User user, AppFrame appFrame){
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         add(new JLabel("Department Code:"));
@@ -34,6 +35,7 @@ public class AddDepartmentPanel extends JPanel{
                         String deptCode = codeField.getText();
                         String deptName = nameField.getText();
                         SystemsOperations.addDepartment(user, deptCode, deptName, con);
+                        JOptionPane.showMessageDialog(appFrame, "The department is added!");
                     } catch (SQLException e1) {
                         e1.printStackTrace();
                     } finally {

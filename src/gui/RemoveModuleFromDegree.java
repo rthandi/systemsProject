@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class RemoveModuleFromDegree extends JPanel {
-    public RemoveModuleFromDegree(User user){
+    public RemoveModuleFromDegree(User user, AppFrame appFrame){
         Connection con = null;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -43,6 +43,7 @@ public class RemoveModuleFromDegree extends JPanel {
                     if ((modIds.contains(chosenModule)) && (degIds.contains(chosenDegree))) {
                         try {
                             SystemsOperations.deleteDegModAprov(user, chosenModule, chosenDegree, finalCon);
+                            JOptionPane.showMessageDialog(appFrame, "Module removed from degree");
                         } catch (SQLException e1) {
                             e1.printStackTrace();
                         } finally {

@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import javax.swing.*;
 
 public class RemoveUserPanel extends JPanel {
-	public RemoveUserPanel(User user) {
+	public RemoveUserPanel(User user, AppFrame appFrame) {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createTitledBorder("Remove Student:"));
 		
@@ -32,10 +32,10 @@ public class RemoveUserPanel extends JPanel {
 						con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
 						
 						String username = usernameField.getText();
-						
 						PreparedStatement stmt = con.prepareStatement("DELETE FROM User WHERE Username = ?");
 						stmt.setString(1, username);
 						stmt.executeUpdate();
+						JOptionPane.showMessageDialog(appFrame, "User is deleted");
 					} catch (SQLException e1) {
 						e1.printStackTrace();
 					} finally {

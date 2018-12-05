@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class DeleteDepartmentPanel extends JPanel{
-    public DeleteDepartmentPanel(User user){
+    public DeleteDepartmentPanel(User user, AppFrame appFrame){
         ArrayList<Department> depts = null;
         try {
             depts = SystemsOperations.getDept();
@@ -37,6 +37,7 @@ public class DeleteDepartmentPanel extends JPanel{
                         con = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk/team029", "team029", "5afef30f");
                         SystemsOperations.deleteDepartment(user, chosen.getDepartmentCode(), con);
                         deptList.remove(deptList.getSelectedIndex()); //ewwwwwww
+                        JOptionPane.showMessageDialog(appFrame, "Department Deleted");
                         con.close();
                     }catch(SQLException e1) {
                         e1.printStackTrace();

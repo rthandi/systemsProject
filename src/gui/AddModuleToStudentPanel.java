@@ -9,7 +9,7 @@ import javax.swing.*;
 
 
 public class AddModuleToStudentPanel extends JPanel {
-	public AddModuleToStudentPanel(User user) {
+	public AddModuleToStudentPanel(User user, AppFrame appFrame) {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createTitledBorder("Add module"));
 
@@ -45,6 +45,7 @@ public class AddModuleToStudentPanel extends JPanel {
 
                             User student = SystemsOperations.getUser(username, userHash, con);
                             SystemsOperations.addOptionalModuleToUser(user, student, moduleId, con);
+							JOptionPane.showMessageDialog(appFrame, "Module added to users");
 						} else {
                             System.out.println("No such user");
                         }

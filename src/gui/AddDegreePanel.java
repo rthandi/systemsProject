@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class AddDegreePanel extends JPanel {
-    public AddDegreePanel(User user){
+    public AddDegreePanel(User user, AppFrame appFrame){
         ArrayList<Department> depts = null;
         try {
             depts = SystemsOperations.getDept();
@@ -50,6 +50,7 @@ public class AddDegreePanel extends JPanel {
                         Department leadDept = (Department) leadDeptList.getSelectedItem();
                         String deptCode = leadDept.getDepartmentCode();
                         SystemsOperations.addDegree(user, degID, degName, deptCode, con);
+                        JOptionPane.showMessageDialog(appFrame, "The degree is added!");
                     }catch(SQLException e1) {
                         e1.printStackTrace();
                     }finally{

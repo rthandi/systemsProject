@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ModuleDegreePanel extends JPanel {
-    public ModuleDegreePanel(User user) {
+    public ModuleDegreePanel(User user, AppFrame appFrame) {
 
         ArrayList<Degree> degrees = null;
         try {
@@ -66,6 +66,7 @@ public class ModuleDegreePanel extends JPanel {
                         level = '4';
                     }
                     SystemsOperations.addModuleToDegree(user,degreeId, level, moduleId,compulsory,con);
+                    JOptionPane.showMessageDialog(appFrame, "Module added to degree");
                 } catch (SQLException e1) {
                     e1.printStackTrace();
                 } finally {
