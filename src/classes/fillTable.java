@@ -28,29 +28,110 @@ public class fillTable {
 			      
 			    
 			    System.out.println("--- Populating Modules table");
-				
+				//COM - MEng
 			    sql = "INSERT INTO Modules " +
-		              "VALUES ('COM1001', 'Intro to Software', 20)";
+		              "VALUES ('COM1001', 'Intro to Software Engineering', 20)";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Modules " +
 		              "VALUES ('COM1002', 'Foundations of Computer Science', 20)";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Modules " +
-		              "VALUES ('COM1006', 'Devices and Networks', 20)";
+		              "VALUES ('COM1003', 'Devices and Networks', 20)";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Modules " +
-		              "VALUES ('COM2004', 'Data Driven Computing', 20)";
+		              "VALUES ('COM1004', 'Java Programming', 20)";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Modules " +
-		              "VALUES ('COM2008', 'Systems Design', 20)";
+		              "VALUES ('COM1005', 'Machines and Intelligence', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('COM2001', 'Data Driven Computing', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('COM2002', 'Systems Design', 20)";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Modules " +
 		              "VALUES ('COMP000', 'Placement', 0)";
 			    stmt.executeUpdate(sql);
+			    
+			    // COM - Bsc
 			    sql = "INSERT INTO Modules " +
-		              "VALUES ('BUS4001', 'Sell things', 20)";
+		              "VALUES ('COM1006', 'Foundations of Object Oriented Programming', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('COM1007', 'Professional Issues', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('COM1008', 'Advanced Java Programming', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('COM1009', 'Computer Security and Forensics', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('COM1010', 'Web Technologies', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('COM2003', 'Cloud Computing', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('COM2004', 'Information Systems Modelling', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('COM2005', 'Information Systems Project Management', 10)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+			    	  "VALUES ('COM2006', 'Information Systems Organisations', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('COM2007', 'Information Systems and Information Society', 10)";
 			    stmt.executeUpdate(sql);
 			      
+			    //PSY - MPsy
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('PSY3001', 'Research Methods', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('PSY3002', 'Current Issues in Psychology', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('PSY3003', 'Psychology Fundamentals', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('COM3004', 'Computational Neuroscience', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+			    	  "VALUES ('COM3005', 'Text Processing', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('PSY3006', 'Natural Language Processing', 20)";
+			    stmt.executeUpdate(sql);
+				    
+			    //BUS - MSC
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('BUS4001', 'Managing People in Organisation', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('BUS4002', 'Marketing', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('BUS4003', 'Strategic Management', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('BUS4004', 'Company Project', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('BUS4005', 'Economics', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('BUS4006', 'Management Inquiry', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('BUS4007', 'Accountic', 20)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Modules " +
+		              "VALUES ('BUS4008', 'Financial Management', 20)";
+			    stmt.executeUpdate(sql);
+										    
 			    
 			    System.out.println("--- Populating Degree table");
 				  
@@ -84,34 +165,132 @@ public class fillTable {
 			    
 			    
 			    System.out.println("--- Populating Student table");
-			      
+			    sql = "INSERT INTO Student " +
+				      "VALUES ('ddd18dd', 'COMU01', 'Mr Phil', '1', DEFAULT)";
+			    stmt.executeUpdate(sql); 
 			      
 			    System.out.println("--- Populating Student Module table");
-			      
+			    sql = "INSERT INTO Student_Module " +
+				      "VALUES ('ddd18dd', 'COM1001', '50')";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Student_Module " +
+				      "VALUES ('ddd18dd', 'COM1002', '50')";
+			    stmt.executeUpdate(sql); 
+			    sql = "INSERT INTO Student_Module " +
+				      "VALUES ('ddd18dd', 'COM1003', '50')";
+			    stmt.executeUpdate(sql); 
+			    sql = "INSERT INTO Student_Module " +
+				      "VALUES ('ddd18dd', 'COM1004', '50')";
+			    stmt.executeUpdate(sql); 
+			    sql = "INSERT INTO Student_Module " +
+				      "VALUES ('ddd18dd', 'COM1005', '50')";
+			    stmt.executeUpdate(sql); 
+			    sql = "INSERT INTO Student_Module " +
+				      "VALUES ('ddd18dd', 'COM1006', '50')";
+			    stmt.executeUpdate(sql); 
 			      
 			    System.out.println("--- Populating Degree_Module_Approved table");
-				
+				// COM
 			    sql = "INSERT INTO Degree_Module_Approved " +
-		              "VALUES ('COMU01', 1, 'COM1001', True)";
+		              "VALUES ('COMP12', 1, 'COM1001', True)";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Degree_Module_Approved " +
-		              "VALUES ('COMU01', 1, 'COM1002', True)";
+		              "VALUES ('COMP12', 1, 'COM1002', True)";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Degree_Module_Approved " +
-		              "VALUES ('COMU01', 1, 'COM1006', False)";
+		              "VALUES ('COMP12', 1, 'COM1003', True)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('COMP12', 1, 'COM1004', True)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('COMP12', 1, 'COM1005', True)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('COMU01', 1, 'COM1006', True)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('COMU01', 1, 'COM1007', False)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('COMU01', 1, 'COM1008', False)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('COMU01', 1, 'COM1009', False)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('COMU01', 1, 'COM1010', False)";
+			    stmt.executeUpdate(sql);
+			    
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('COMP12', 2, 'COM2001', True)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('COMP12', 2, 'COM2002', True)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('COMU01', 2, 'COM2003', True)";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Degree_Module_Approved " +
 		              "VALUES ('COMU01', 2, 'COM2004', True)";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Degree_Module_Approved " +
-		              "VALUES ('COMU01', 2, 'COM2008', True)";
+		              "VALUES ('COMU01', 2, 'COM2005', True)";
 			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('COMU01', 2, 'COM2006', False)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('COMU01', 2, 'COM2007', False)";
+			    stmt.executeUpdate(sql);
+			    
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('PSYP01', 3, 'COM3004', False)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('PSYP01', 3, 'COM3005', False)";
+			    stmt.executeUpdate(sql);
+			    
+			    // PSY
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('PSYP01', 3, 'PSY3001', True)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('PSYP01', 3, 'PSY3002', True)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('PSYP01', 3, 'PSY3003', False)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('PSYP01', 3, 'PSY3006', False)";
+			    stmt.executeUpdate(sql);
+			    
+			    // BUS
 			    sql = "INSERT INTO Degree_Module_Approved " +
 		              "VALUES ('BUSP01', 4, 'BUS4001', True)";
 			    stmt.executeUpdate(sql);
 			    sql = "INSERT INTO Degree_Module_Approved " +
-		              "VALUES ('BUSP01', 3, 'COM1006', False)";
+		              "VALUES ('BUSP01', 4, 'BUS4002', True)";
 			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('BUSP01', 4, 'BUS4003', True)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('BUSP01', 4, 'BUS4004', True)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('BUSP01', 4, 'BUS4005', True)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('BUSP01', 4, 'BUS4006', False)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('BUSP01', 4, 'BUS4007', False)";
+			    stmt.executeUpdate(sql);
+			    sql = "INSERT INTO Degree_Module_Approved " +
+		              "VALUES ('BUSP01', 4, 'BUS4008', False)";
+			    stmt.executeUpdate(sql);
+						    
 			    
 			    System.out.println("Completed populating tables");
 			}
